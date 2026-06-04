@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CORED — Coordinadoras para la Reducción de Desastres</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- ▶ Matriz de datos: edita datos.js para actualizar el mapa y rankings -->
+  <script src="datos.js"></script>
+  <style>
+    :root {
+      --bg:#0b1220; --surface:#111827; --surface2:#1a2535; --border:#1e3050;
+      --accent:#f97316; --accent2:#facc15; --text:#e2e8f0; --muted:#64748b;
+    }
+    *{box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;margin:0;overflow-x:hidden;}
+
+    /* ── NAV ── */
+    #navbar{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      background:rgba(11,18,32,0.93);backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 2rem;height:64px;
+    }
+    .logo-text{font-size:1.35rem;font-weight:800;letter-spacing:-0.02em;background:linear-gradient(90deg,#f97316,#facc15);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .logo-sub{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.15em;}
+    .nav-links{display:flex;gap:0.25rem;list-style:none;margin:0;padding:0;}
+    .nav-links a{display:inline-block;padding:0.45rem 1rem;font-size:0.82rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);text-decoration:none;border-radius:6px;transition:color 0.2s,background 0.2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--accent);background:rgba(249,115,22,0.1);}
+
+    /* ── HERO ── */
+    #inicio{min-height:100vh;padding-top:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;text-align:center;padding-left:1.5rem;padding-right:1.5rem;}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(249,115,22,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(249,115,22,0.04) 1px,transparent 1px);background-size:48px 48px;}
+    .hero-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:700px;height:500px;border-radius:50%;background:radial-gradient(ellipse,rgba(249,115,22,0.12) 0%,transparent 70%);pointer-events:none;}
+    .alert-badge{display:inline-flex;align-items:center;gap:0.5rem;font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.12em;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#fca5a5;border-radius:100px;padding:0.3rem 0.9rem;margin-bottom:2rem;}
+    .alert-dot{width:6px;height:6px;border-radius:50%;background:#ef4444;animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+    .hero-title{font-size:clamp(2.5rem,6vw,5rem);font-weight:800;letter-spacing:-0.03em;line-height:1.1;max-width:820px;margin-bottom:1.5rem;}
+    .hero-title span{background:linear-gradient(90deg,#f97316,#facc15);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .hero-sub{max-width:580px;font-size:1.05rem;color:var(--muted);line-height:1.7;margin-bottom:2.5rem;}
+    .hero-cta{display:inline-flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;}
+    .btn-primary{background:var(--accent);color:#0b1220;font-weight:700;font-size:0.85rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.8rem 2rem;border-radius:8px;text-decoration:none;transition:transform 0.15s,box-shadow 0.15s;border:none;cursor:pointer;display:inline-block;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(249,115,22,0.35);}
+    .btn-secondary{background:transparent;color:var(--text);font-weight:600;font-size:0.85rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.8rem 2rem;border-radius:8px;text-decoration:none;border:1px solid var(--border);transition:border-color 0.2s,color 0.2s;cursor:pointer;display:inline-block;}
+    .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+
+    /* STATS */
+    .stats-bar{display:flex;flex-wrap:wrap;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:4rem auto 0;max-width:480px;width:100%;position:relative;z-index:1;}
+    .stat-item{flex:1;min-width:150px;background:var(--surface);padding:1.25rem 1.5rem;}
+    .stat-value{font-size:2rem;font-weight:800;color:var(--accent);line-height:1;}
+    .stat-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-top:0.35rem;}
+
+    /* SECTIONS */
+    .section{padding:5rem 1.5rem;max-width:1100px;margin:0 auto;}
+    .section-tag{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem;}
+    .section-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-0.02em;line-height:1.2;margin:0 0 1rem;}
+    .section-title span{color:var(--accent);}
+    .section-desc{max-width:560px;color:var(--muted);line-height:1.75;font-size:0.95rem;}
+    .divider{border:none;border-top:1px solid var(--border);margin:0;}
+
+    /* CARDS GENERAL */
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;margin-top:3rem;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.75rem;position:relative;overflow:hidden;transition:border-color 0.25s,transform 0.2s;}
+    .card:hover{border-color:var(--accent);transform:translateY(-3px);}
+    .card-icon{font-size:2rem;margin-bottom:1rem;}
+    .card-title{font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;}
+    .card-text{font-size:0.85rem;color:var(--muted);line-height:1.65;}
+    .card-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
+    .card:hover .card-line{transform:scaleX(1);}
+
+    /* MAP */
+    #mapa{height:500px;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+    .map-legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;}
+    .legend-item{display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;color:var(--muted);}
+    .legend-dot{width:12px;height:12px;border-radius:50%;}
+    .map-controls{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
+    .map-filter-btn{font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all 0.2s;}
+    .map-filter-btn:hover,.map-filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(249,115,22,0.1);}
+    .map-search{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Sora',sans-serif;font-size:0.82rem;padding:0.4rem 0.8rem;outline:none;transition:border-color 0.2s;min-width:200px;}
+    .map-search:focus{border-color:var(--accent);}
+
+    /* BADGE */
+    .badge{display:inline-block;font-size:0.68rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:0.2rem 0.55rem;border-radius:4px;}
+    .badge-alto {background:rgba(34,197,94,0.2);color:#86efac;}
+    .badge-medio{background:rgba(250,204,21,0.2);color:#fde68a;}
+    .badge-bajo {background:rgba(239,68,68,0.2);color:#fca5a5;}
+
+    /* FORTALECIMIENTO RANKING */
+    .ftl-rank-grid{display:grid;gap:0.75rem;margin-top:2rem;}
+    .ftl-rank-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.5rem;display:flex;align-items:center;gap:1.25rem;transition:border-color 0.2s,transform 0.15s;}
+    .ftl-rank-card:hover{border-color:var(--accent);transform:translateX(4px);}
+    .ftl-rank-pos{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:1.3rem;color:var(--accent);min-width:36px;}
+    .ftl-rank-info{flex:1;min-width:0;}
+    .ftl-rank-name{font-weight:700;font-size:0.92rem;}
+    .ftl-rank-dept{font-size:0.75rem;color:var(--muted);margin-top:0.15rem;}
+    .ftl-rank-bar-wrap{flex:0 0 180px;}
+    .ftl-rank-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:0.3rem;}
+    .ftl-rank-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+    .ftl-rank-pts{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--accent);}
+
+    /* FORTALECIMIENTO EJES */
+    .ftl-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;}
+    .ftl-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem;position:relative;overflow:hidden;}
+    .ftl-num{font-family:'IBM Plex Mono',monospace;font-size:3.5rem;font-weight:800;position:absolute;top:1rem;right:1.5rem;color:rgba(249,115,22,0.08);line-height:1;pointer-events:none;}
+    .ftl-title{font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;}
+    .ftl-text{font-size:0.85rem;color:var(--muted);line-height:1.7;}
+    .ftl-list{list-style:none;padding:0;margin:0.75rem 0 0;}
+    .ftl-list li{font-size:0.85rem;color:var(--muted);padding:0.35rem 0;border-bottom:1px solid rgba(30,48,80,0.4);display:flex;gap:0.5rem;align-items:flex-start;}
+    .ftl-list li:last-child{border-bottom:none;}
+    .ftl-list li::before{content:'▸';color:var(--accent);flex-shrink:0;margin-top:0.05rem;}
+
+    /* BUENAS PRÁCTICAS */
+    .bp-form-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2.5rem;max-width:720px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+    .form-group{display:flex;flex-direction:column;gap:0.4rem;}
+    .form-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+    .form-input,.form-textarea,.form-select{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:0.88rem;padding:0.65rem 0.9rem;outline:none;transition:border-color 0.2s;width:100%;}
+    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--accent);}
+    .form-textarea{resize:vertical;min-height:110px;}
+    .form-select option{background:var(--bg);}
+    .submit-btn{background:var(--accent);color:#0b1220;font-weight:700;font-size:0.82rem;letter-spacing:0.07em;text-transform:uppercase;padding:0.75rem 2rem;border-radius:8px;border:none;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;margin-top:0.75rem;}
+    .submit-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(249,115,22,0.35);}
+    .submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+    .bp-note{font-size:0.78rem;color:var(--muted);margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);line-height:1.6;}
+    .bp-success{display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.35);border-radius:10px;padding:1.5rem;text-align:center;margin-top:1.5rem;}
+    .bp-success-icon{font-size:2.5rem;margin-bottom:0.5rem;}
+    .bp-success-title{font-weight:700;font-size:1rem;color:#86efac;margin-bottom:0.4rem;}
+    .bp-success-text{font-size:0.85rem;color:var(--muted);}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center;font-size:0.78rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+    footer a{color:var(--muted);text-decoration:none;opacity:0.5;}
+    footer a:hover{opacity:1;color:var(--accent);}
+
+    @media(max-width:680px){
+      .ftl-grid,.form-row{grid-template-columns:1fr;}
+      .nav-links{display:none;}
+      .ftl-rank-bar-wrap{display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ NAVBAR ═══════════ -->
+<nav id="navbar">
+  <div>
+    <div class="logo-text">CORED</div>
+    <div class="logo-sub">Sistema Nacional de Coordinadoras</div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#inicio"            class="active">Inicio</a></li>
+    <li><a href="#mapa-section">Mapa</a></li>
+    <li><a href="#fortalecimiento">Fortalecimiento</a></li>
+    <li><a href="#buenas-practicas">Buenas Prácticas</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section id="inicio">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="alert-badge">
+    <span class="alert-dot"></span>
+    Sistema activo — Nivel de alerta: Amarillo
+  </div>
+  <h1 class="hero-title">Reducción de Riesgos<br><span>Coordinada y Eficaz</span></h1>
+  <p class="hero-sub">
+    Plataforma nacional de coordinación interinstitucional para la prevención,
+    mitigación y respuesta ante desastres naturales y antrópicos.
+  </p>
+  <div class="hero-cta">
+    <a href="#mapa-section" class="btn-primary">Ver Mapa Interactivo</a>
+    <a href="#buenas-practicas" class="btn-secondary">Enviar Buena Práctica</a>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value" id="stat-coordinadoras">—</div>
+      <div class="stat-label">Coordinadoras registradas</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="stat-departamentos">—</div>
+      <div class="stat-label">Departamentos cubiertos</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CONTENIDO GENERAL ═══════════ -->
+<hr class="divider">
+<section class="section" id="contenido-general">
+  <p class="section-tag">// Contenido General</p>
+  <h2 class="section-title">Sistema de <span>Coordinadoras</span></h2>
+  <p class="section-desc">Red jerarquizada de instituciones públicas, privadas y comunitarias orientadas a la gestión integral del riesgo de desastres en el territorio nacional.</p>
+  <div class="cards-grid">
+    <div class="card"><div class="card-line"></div><div class="card-icon">🏛️</div><div class="card-title">Marco Legal</div><div class="card-text">Decreto 109-96 y sus reformas establecen la estructura del Sistema Nacional de Reducción de Desastres, con coordinadoras en cuatro niveles territoriales.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">🌐</div><div class="card-title">Estructura Territorial</div><div class="card-text">Coordinadoras nacionales, regionales, departamentales, municipales y locales conforman una red integrada de respuesta y prevención.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">📡</div><div class="card-title">Sistema de Alerta</div><div class="card-text">Monitoreo continuo de amenazas volcánicas, sísmicas, hidrometeorológicas y tecnológicas con protocolos de alerta a cada nivel territorial.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">🤝</div><div class="card-title">Interinstitucionalidad</div><div class="card-text">Articulación de instituciones del Estado, ONGs, empresa privada y comunidades en torno a la gestión del riesgo de desastres.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">🎓</div><div class="card-title">Formación Continua</div><div class="card-text">Programas de capacitación técnica, simulacros nacionales y formación de brigadistas comunitarios en todo el territorio.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">📊</div><div class="card-title">Evaluación y Mejora</div><div class="card-text">Sistema de indicadores de desempeño para medir la efectividad de las coordinadoras y guiar planes de fortalecimiento institucional.</div></div>
+  </div>
+</section>
+
+<!-- ═══════════ MAPA ═══════════ -->
+<hr class="divider">
+<section class="section" id="mapa-section">
+  <p class="section-tag">// Dashboard — Mapa Interactivo</p>
+  <h2 class="section-title">Cobertura <span>Municipal</span></h2>
+  <p class="section-desc">Datos cargados desde la matriz oficial (<code style="font-family:'IBM Plex Mono',monospace;font-size:0.85em;color:var(--accent)">datos.js</code>). Haz clic en cualquier punto para ver el detalle de la coordinadora.</p>
+
+  <div class="map-controls" style="margin-top:2rem;">
+    <button class="map-filter-btn active" onclick="filtrarMapa('todos',this)">Todos</button>
+    <button class="map-filter-btn" onclick="filtrarMapa('Alto',this)">Alto desempeño</button>
+    <button class="map-filter-btn" onclick="filtrarMapa('Medio',this)">Desempeño medio</button>
+    <button class="map-filter-btn" onclick="filtrarMapa('Bajo',this)">Requiere apoyo</button>
+    <input class="map-search" id="map-search" type="text" placeholder="Buscar municipio o departamento…" oninput="buscarEnMapa(this.value)" />
+  </div>
+
+  <div id="mapa"></div>
+  <div class="map-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Alto desempeño</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#facc15"></div>Desempeño medio</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Requiere fortalecimiento</div>
+  </div>
+</section>
+
+<!-- ═══════════ FORTALECIMIENTO ═══════════ -->
+<hr class="divider">
+<section class="section" id="fortalecimiento">
+  <p class="section-tag">// Fortalecimiento Institucional</p>
+  <h2 class="section-title">Coordinadoras con más <span>Temas a Favor</span></h2>
+  <p class="section-desc">Ranking generado automáticamente desde la matriz de datos. Las coordinadoras con mayor número de temas de fortalecimiento activos aparecen primero.</p>
+
+  <div class="ftl-rank-grid" id="ftl-ranking"></div>
+
+  <h3 style="font-size:1.2rem;font-weight:700;margin-top:4rem;margin-bottom:0.5rem;">Ejes Estratégicos de Fortalecimiento</h3>
+  <p style="color:var(--muted);font-size:0.85rem;margin-top:0;margin-bottom:0;">Marco de referencia para el desarrollo institucional de las coordinadoras.</p>
+  <div class="ftl-grid" style="margin-top:1.5rem;">
+    <div class="ftl-card"><div class="ftl-num">01</div><div class="ftl-title">🏗️ Capacidad Operativa</div><div class="ftl-text">Dotación de equipos, vehículos y centros de operaciones de emergencia funcionales.</div><ul class="ftl-list"><li>Actualización de inventarios de recursos</li><li>Protocolos de activación de COE</li><li>Redes de comunicación redundantes</li><li>Equipo de protección personal (EPP)</li></ul></div>
+    <div class="ftl-card"><div class="ftl-num">02</div><div class="ftl-title">📚 Formación y Capacitación</div><div class="ftl-text">Programas de formación técnica continua para integrantes de coordinadoras.</div><ul class="ftl-list"><li>Cursos de gestión del riesgo (INSIVUMEH)</li><li>Primeros auxilios y rescate</li><li>Análisis de vulnerabilidad territorial</li><li>Sistemas de información geográfica (SIG)</li></ul></div>
+    <div class="ftl-card"><div class="ftl-num">03</div><div class="ftl-title">📋 Planificación Estratégica</div><div class="ftl-text">Elaboración y actualización periódica de planes de respuesta y contingencia.</div><ul class="ftl-list"><li>Plan Municipal de Respuesta (PMR)</li><li>Mapas de riesgo actualizados</li><li>Planes de evacuación comunitaria</li><li>Protocolos de alerta temprana</li></ul></div>
+    <div class="ftl-card"><div class="ftl-num">04</div><div class="ftl-title">🔗 Articulación Interinstitucional</div><div class="ftl-text">Fortalecimiento de lazos entre instituciones para una respuesta coordinada y efectiva.</div><ul class="ftl-list"><li>Mesas técnicas intersectoriales</li><li>Acuerdos de cooperación</li><li>Ejercicios conjuntos de simulacro</li><li>Rendición de cuentas ante la CONRED</li></ul></div>
+  </div>
+</section>
+
+<!-- ═══════════ BUENAS PRÁCTICAS — SOLO ENVÍO ═══════════ -->
+<hr class="divider">
+<section class="section" id="buenas-practicas">
+  <p class="section-tag">// Buenas Prácticas</p>
+  <h2 class="section-title">Envía tu <span>Buena Práctica</span></h2>
+  <p class="section-desc">Comparte tu experiencia con el sistema. El equipo técnico de CORED revisará tu aporte y solo publicará las prácticas que cumplan los criterios de calidad.</p>
+
+  <div class="bp-form-wrap" style="margin-top:2.5rem;">
+    <h3 style="font-size:1rem;font-weight:700;margin:0 0 1.5rem;">Formulario de envío</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="bp-nombre">Nombre completo</label>
+        <input class="form-input" id="bp-nombre" type="text" placeholder="Ej. Ana García" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="bp-institucion">Institución / Coordinadora</label>
+        <input class="form-input" id="bp-institucion" type="text" placeholder="Ej. COMRED Zacapa" />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="bp-correo">Correo electrónico</label>
+        <input class="form-input" id="bp-correo" type="email" placeholder="correo@ejemplo.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="bp-categoria">Categoría</label>
+        <select class="form-select" id="bp-categoria">
+          <option value="">— Selecciona —</option>
+          <option>Prevención</option>
+          <option>Preparación</option>
+          <option>Respuesta</option>
+          <option>Recuperación</option>
+          <option>Comunicación</option>
+          <option>Capacitación</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label class="form-label" for="bp-titulo">Título de la buena práctica</label>
+      <input class="form-input" id="bp-titulo" type="text" placeholder="Ej. Sistema de alerta comunitaria con WhatsApp" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="bp-descripcion">Descripción detallada</label>
+      <textarea class="form-textarea" id="bp-descripcion" placeholder="Describe la práctica: contexto, cómo se implementó, resultados obtenidos y recomendaciones para replicarla..."></textarea>
+    </div>
+
+    <button class="submit-btn" id="bp-submit" onclick="enviarBuenaPractica()">Enviar para revisión ▸</button>
+
+    <div class="bp-note">
+      ⚠️ <strong>Nota:</strong> Tu aporte será revisado por el equipo técnico antes de ser publicado.
+      Solo se publicarán prácticas que cumplan con los criterios de calidad y relevancia.
+      Recibirás respuesta al correo indicado en un plazo de 5 días hábiles.
+    </div>
+
+    <div class="bp-success" id="bp-success">
+      <div class="bp-success-icon">✅</div>
+      <div class="bp-success-title">¡Envío recibido correctamente!</div>
+      <div class="bp-success-text">Tu buena práctica fue registrada. El equipo técnico la revisará y te notificará por correo electrónico.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+  <p>CORED — Sistema Nacional de Coordinadoras para la Reducción de Desastres &nbsp;|&nbsp; Guatemala</p>
+  <p style="margin-top:0.5rem;">
+    Sitio informativo · Los datos provienen de la matriz oficial ·
+    <a href="consola-admin.html">Consola admin</a>
+  </p>
+</footer>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script>
+// ── NAV ACTIVO EN SCROLL ──
+const navSections = ['inicio','mapa-section','fortalecimiento','buenas-practicas'];
+window.addEventListener('scroll', () => {
+  const y = window.scrollY + 80;
+  navSections.forEach(id => {
+    const el   = document.getElementById(id);
+    const link = document.querySelector(`.nav-links a[href="#${id}"]`);
+    if (!el || !link) return;
+    if (y >= el.offsetTop && y < el.offsetTop + el.offsetHeight) {
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      link.classList.add('active');
+    }
+  });
+});
+
+// ── DATOS ──
+const DATA = window.CORED_DATA || [];
+
+// ── HERO STATS ──
+document.getElementById('stat-coordinadoras').textContent = DATA.length || '—';
+const depts = new Set(DATA.map(d => d.departamento));
+document.getElementById('stat-departamentos').textContent = depts.size || '—';
+
+// ── MAPA LEAFLET ──
+const map = L.map('mapa', { zoomControl:true }).setView([15.2, -90.3], 7);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution:'&copy; <a href="https://carto.com">CARTO</a>', maxZoom:18
+}).addTo(map);
+
+const colores = { 'Alto':'#22c55e', 'Medio':'#facc15', 'Bajo':'#ef4444' };
+let marcadores = [];
+
+function crearMarcador(d) {
+  const color = colores[d.nivel] || '#64748b';
+  const icon = L.divIcon({
+    html:`<div style="width:13px;height:13px;border-radius:50%;background:${color};border:2px solid #0b1220;box-shadow:0 0 8px ${color}88;cursor:pointer"></div>`,
+    className:'', iconSize:[13,13]
+  });
+  const m = L.marker([d.lat, d.lng], { icon }).bindPopup(`
+    <div style="font-family:'Sora',sans-serif;min-width:210px">
+      <div style="font-weight:700;color:#f97316;font-size:0.92rem;margin-bottom:0.3rem">${d.nombre_coordinadora}</div>
+      <div style="font-size:0.78rem;color:#94a3b8;margin-bottom:0.6rem">${d.municipio}, ${d.departamento}</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.2rem">
+        <span>Nivel:</span><strong style="color:${color}">${d.nivel}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem">
+        <span>Temas fortalecimiento:</span><strong style="color:#f97316">${d.temas_fortalecimiento}</strong>
+      </div>
+    </div>
+  `);
+  m._datos = d;
+  return m;
+}
+
+function renderMarcadores(filtro) {
+  marcadores.forEach(m => map.removeLayer(m));
+  marcadores = [];
+  DATA.filter(d => filtro === 'todos' || d.nivel === filtro).forEach(d => {
+    const m = crearMarcador(d);
+    m.addTo(map);
+    marcadores.push(m);
+  });
+}
+renderMarcadores('todos');
+
+function filtrarMapa(filtro, btn) {
+  document.querySelectorAll('.map-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('map-search').value = '';
+  renderMarcadores(filtro);
+}
+
+function buscarEnMapa(q) {
+  const t = q.toLowerCase().trim();
+  marcadores.forEach(m => {
+    const d = m._datos;
+    const ok = !t || [d.municipio, d.departamento, d.nombre_coordinadora].some(s => s.toLowerCase().includes(t));
+    ok ? (!map.hasLayer(m) && m.addTo(map)) : (map.hasLayer(m) && map.removeLayer(m));
+  });
+}
+
+// ── FORTALECIMIENTO RANKING (desde datos.js) ──
+const topData = [...DATA].sort((a,b) => b.temas_fortalecimiento - a.temas_fortalecimiento).slice(0,10);
+const maxTemas = topData[0]?.temas_fortalecimiento || 1;
+
+document.getElementById('ftl-ranking').innerHTML = topData.length
+  ? topData.map((d,i) => {
+      const color = colores[d.nivel] || '#64748b';
+      const pct   = Math.round((d.temas_fortalecimiento / maxTemas) * 100);
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1).padStart(2,'0');
+      return `
+      <div class="ftl-rank-card">
+        <div class="ftl-rank-pos">${medal}</div>
+        <div class="ftl-rank-info">
+          <div class="ftl-rank-name">${d.nombre_coordinadora}</div>
+          <div class="ftl-rank-dept">${d.municipio} · ${d.departamento}</div>
+        </div>
+        <div style="margin-right:0.75rem">
+          <span class="badge badge-${d.nivel.toLowerCase()}">${d.nivel}</span>
+        </div>
+        <div class="ftl-rank-bar-wrap">
+          <div class="ftl-rank-bar"><div class="ftl-rank-fill" style="width:${pct}%"></div></div>
+          <div class="ftl-rank-pts">${d.temas_fortalecimiento} temas</div>
+        </div>
+      </div>`;
+    }).join('')
+  : `<div style="text-align:center;padding:2rem;color:var(--muted)">No hay datos en la matriz. Edita <code>datos.js</code> para agregar coordinadoras.</div>`;
+
+// ── BUENAS PRÁCTICAS — SOLO ENVÍO ──
+const BP_KEY = 'cored_bp_inbox_v1';
+
+function enviarBuenaPractica() {
+  const nombre      = document.getElementById('bp-nombre').value.trim();
+  const institucion = document.getElementById('bp-institucion').value.trim();
+  const correo      = document.getElementById('bp-correo').value.trim();
+  const categoria   = document.getElementById('bp-categoria').value;
+  const titulo      = document.getElementById('bp-titulo').value.trim();
+  const descripcion = document.getElementById('bp-descripcion').value.trim();
+
+  if (!nombre || !institucion || !correo || !categoria || !titulo || !descripcion) {
+    alert('Por favor completa todos los campos antes de enviar.');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+    alert('Ingresa un correo electrónico válido.');
+    return;
+  }
+
+  // Guardar en bandeja (localStorage) — la consola admin lo muestra
+  const inbox = JSON.parse(localStorage.getItem(BP_KEY) || '[]');
+  inbox.push({ nombre, institucion, correo, categoria, titulo, descripcion, estado:'pendiente', fecha: new Date().toISOString() });
+  localStorage.setItem(BP_KEY, JSON.stringify(inbox));
+
+  // Limpiar y mostrar éxito
+  ['bp-nombre','bp-institucion','bp-correo','bp-titulo','bp-descripcion'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('bp-categoria').value = '';
+  document.getElementById('bp-submit').disabled = true;
+  document.getElementById('bp-success').style.display = 'block';
+}
+</script>
+</body>
+</html>

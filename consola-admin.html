@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CORED — Consola de Administración</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:#0b1220; --surface:#111827; --surface2:#1a2535; --border:#1e3050;
+      --accent:#f97316; --accent2:#facc15; --text:#e2e8f0; --muted:#64748b;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-height:100vh}
+    header{
+      background:rgba(11,18,32,0.95);border-bottom:1px solid var(--border);
+      padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:10;
+    }
+    .logo{font-size:1.1rem;font-weight:800;background:linear-gradient(90deg,#f97316,#facc15);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .logo-sub{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.15em;margin-top:0.1rem}
+    .header-badge{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);border:1px solid var(--border);padding:0.35rem 0.9rem;border-radius:6px;}
+    main{max-width:1000px;margin:0 auto;padding:2.5rem 1.5rem;}
+    h1{font-size:1.5rem;font-weight:800;margin-bottom:0.4rem;}
+    .subtitle{color:var(--muted);font-size:0.88rem;margin-bottom:2rem;}
+    /* Tabs */
+    .tabs{display:flex;gap:0.25rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+    .tab-btn{
+      font-size:0.8rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;
+      padding:0.55rem 1.25rem;background:transparent;border:none;border-bottom:2px solid transparent;
+      color:var(--muted);cursor:pointer;transition:all 0.2s;margin-bottom:-1px;
+    }
+    .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .tab-btn .count{display:inline-block;background:rgba(249,115,22,0.2);color:var(--accent);font-size:0.65rem;padding:0.1rem 0.45rem;border-radius:10px;margin-left:0.4rem;}
+    /* Cards */
+    .card-list{display:flex;flex-direction:column;gap:1rem;}
+    .bp-card{
+      background:var(--surface);border:1px solid var(--border);border-radius:10px;
+      padding:1.5rem;position:relative;
+    }
+    .bp-card.publicado{border-left:3px solid #22c55e;}
+    .bp-card.rechazado{border-left:3px solid #ef4444;opacity:0.6;}
+    .bp-card.pendiente{border-left:3px solid var(--accent2);}
+    .bp-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:0.75rem;}
+    .bp-title{font-size:1rem;font-weight:700;}
+    .bp-meta{font-size:0.78rem;color:var(--muted);margin-top:0.2rem;}
+    .bp-body{font-size:0.87rem;color:var(--text);line-height:1.7;margin-bottom:1rem;border-left:2px solid var(--border);padding-left:0.9rem;}
+    .bp-actions{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
+    .btn{font-size:0.75rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:0.45rem 1.1rem;border-radius:6px;border:none;cursor:pointer;transition:all 0.15s;}
+    .btn-publish{background:#22c55e;color:#0b1220;}
+    .btn-publish:hover{box-shadow:0 4px 16px rgba(34,197,94,0.35);}
+    .btn-reject{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}
+    .btn-reject:hover{background:rgba(239,68,68,0.25);}
+    .btn-delete{background:rgba(100,116,139,0.1);color:var(--muted);border:1px solid var(--border);}
+    .btn-delete:hover{color:#fca5a5;border-color:rgba(239,68,68,0.3);}
+    .status-badge{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.2rem 0.6rem;border-radius:4px;}
+    .status-pendiente{background:rgba(250,204,21,0.2);color:#fde68a;}
+    .status-publicado{background:rgba(34,197,94,0.2);color:#86efac;}
+    .status-rechazado{background:rgba(239,68,68,0.15);color:#fca5a5;}
+    .categoria-chip{font-size:0.68rem;font-family:'IBM Plex Mono',monospace;letter-spacing:0.05em;color:var(--accent);background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);border-radius:4px;padding:0.15rem 0.5rem;}
+    .empty{text-align:center;padding:4rem 1rem;color:var(--muted);}
+    .empty-icon{font-size:2.5rem;margin-bottom:0.75rem;}
+    /* Export */
+    .toolbar{display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
+    .btn-export{background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:0.78rem;font-weight:600;padding:0.45rem 1rem;border-radius:6px;cursor:pointer;transition:all 0.2s;}
+    .btn-export:hover{border-color:var(--accent);color:var(--accent);}
+    .search-input{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Sora',sans-serif;font-size:0.82rem;padding:0.45rem 0.9rem;outline:none;transition:border-color 0.2s;flex:1;min-width:200px;}
+    .search-input:focus{border-color:var(--accent);}
+    /* Toast */
+    #toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.5rem;font-size:0.85rem;color:var(--text);transform:translateY(100px);opacity:0;transition:all 0.3s;z-index:999;}
+    #toast.show{transform:translateY(0);opacity:1;}
+    .divider-section{border:none;border-top:1px solid var(--border);margin:2.5rem 0;}
+    /* Password */
+    .pw-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);}
+    .pw-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:3rem 2.5rem;text-align:center;width:100%;max-width:380px;}
+    .pw-title{font-size:1.25rem;font-weight:800;margin-bottom:0.5rem;}
+    .pw-sub{color:var(--muted);font-size:0.85rem;margin-bottom:2rem;}
+    .pw-input{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:1rem;padding:0.75rem 1rem;outline:none;width:100%;text-align:center;letter-spacing:0.2em;transition:border-color 0.2s;margin-bottom:1rem;}
+    .pw-input:focus{border-color:var(--accent);}
+    .pw-btn{background:var(--accent);color:#0b1220;font-weight:700;font-size:0.85rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.75rem 2rem;border-radius:8px;border:none;cursor:pointer;width:100%;transition:box-shadow 0.15s;}
+    .pw-btn:hover{box-shadow:0 6px 24px rgba(249,115,22,0.35);}
+    .pw-error{color:#fca5a5;font-size:0.82rem;margin-top:0.75rem;display:none;}
+    #app{display:none;}
+  </style>
+</head>
+<body>
+
+<!-- ── PANTALLA DE CONTRASEÑA ── -->
+<div class="pw-screen" id="pw-screen">
+  <div class="pw-box">
+    <div style="font-size:2rem;margin-bottom:1rem">🔐</div>
+    <div class="pw-title">Consola CORED</div>
+    <div class="pw-sub">Acceso restringido al equipo técnico</div>
+    <input class="pw-input" id="pw-input" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPw()" />
+    <button class="pw-btn" onclick="checkPw()">Ingresar</button>
+    <div class="pw-error" id="pw-error">Contraseña incorrecta. Intenta de nuevo.</div>
+    <p style="font-size:0.72rem;color:var(--muted);margin-top:1.5rem;font-family:'IBM Plex Mono',monospace;">
+      Contraseña por defecto: <strong style="color:var(--accent)">cored2024</strong><br>
+      Cámbiala en la variable ADMIN_PW del script.
+    </p>
+  </div>
+</div>
+
+<!-- ── APP PRINCIPAL ── -->
+<div id="app">
+  <header>
+    <div>
+      <div class="logo">CORED — Consola Admin</div>
+      <div class="logo-sub">Revisión de Buenas Prácticas</div>
+    </div>
+    <div style="display:flex;gap:0.75rem;align-items:center;">
+      <a href="index.html" style="font-size:0.78rem;color:var(--muted);text-decoration:none;font-family:'IBM Plex Mono',monospace;">← Volver al sitio</a>
+      <button onclick="cerrarSesion()" class="btn-export">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main>
+    <h1>Buenas Prácticas Enviadas</h1>
+    <p class="subtitle">Revisa, aprueba o rechaza cada envío. Solo los aprobados serán visibles en el sitio público.</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="cambiarTab('pendiente',this)">Pendientes <span class="count" id="cnt-pendiente">0</span></button>
+      <button class="tab-btn" onclick="cambiarTab('publicado',this)">Publicados <span class="count" id="cnt-publicado">0</span></button>
+      <button class="tab-btn" onclick="cambiarTab('rechazado',this)">Rechazados <span class="count" id="cnt-rechazado">0</span></button>
+      <button class="tab-btn" onclick="cambiarTab('todos',this)">Todos <span class="count" id="cnt-todos">0</span></button>
+    </div>
+
+    <div class="toolbar">
+      <input class="search-input" type="text" placeholder="Buscar por nombre, institución o título…" oninput="buscarEnvios(this.value)" />
+      <button class="btn-export" onclick="exportarCSV()">📥 Exportar CSV</button>
+      <button class="btn-export" onclick="limpiarRechazados()">🗑️ Limpiar rechazados</button>
+    </div>
+
+    <div class="card-list" id="lista-admin"></div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const ADMIN_PW  = 'cored2024';   // ← Cambia esta contraseña
+const BP_KEY    = 'cored_bp_inbox_v1';
+const SESSION   = 'cored_admin_session';
+let   tabActual = 'pendiente';
+let   queryBusqueda = '';
+
+// ── AUTH ──
+function checkPw() {
+  const val = document.getElementById('pw-input').value;
+  if (val === ADMIN_PW) {
+    sessionStorage.setItem(SESSION, '1');
+    document.getElementById('pw-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderAdmin();
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+  }
+}
+function cerrarSesion() {
+  sessionStorage.removeItem(SESSION);
+  location.reload();
+}
+
+// Verificar sesión al cargar
+if (sessionStorage.getItem(SESSION) === '1') {
+  document.getElementById('pw-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+// ── DATA ──
+function getData() {
+  try { return JSON.parse(localStorage.getItem(BP_KEY)) || []; } catch { return []; }
+}
+function saveData(arr) { localStorage.setItem(BP_KEY, JSON.stringify(arr)); }
+
+function updateCounts(data) {
+  ['pendiente','publicado','rechazado'].forEach(s => {
+    document.getElementById('cnt-'+s).textContent = data.filter(d=>d.estado===s).length;
+  });
+  document.getElementById('cnt-todos').textContent = data.length;
+}
+
+// ── RENDER ──
+function renderAdmin() {
+  const data = getData();
+  updateCounts(data);
+
+  const filtrado = data
+    .filter(d => tabActual === 'todos' || d.estado === tabActual)
+    .filter(d => {
+      if (!queryBusqueda) return true;
+      const q = queryBusqueda.toLowerCase();
+      return (d.nombre+d.institucion+d.titulo+d.descripcion).toLowerCase().includes(q);
+    })
+    .slice().reverse();
+
+  const container = document.getElementById('lista-admin');
+
+  if (filtrado.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">${tabActual==='pendiente'?'📭':'📂'}</div><p>No hay envíos en esta sección.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = filtrado.map((bp, idx) => {
+    const realIdx = data.length - 1 - data.slice().reverse().findIndex(
+      x => x.fecha === bp.fecha && x.titulo === bp.titulo
+    );
+    const fecha = new Date(bp.fecha).toLocaleString('es-GT', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    return `
+    <div class="bp-card ${bp.estado}" data-idx="${realIdx}">
+      <div class="bp-header">
+        <div>
+          <div class="bp-title">${esc(bp.titulo)}</div>
+          <div class="bp-meta">
+            <strong>${esc(bp.nombre)}</strong> · ${esc(bp.institucion)} ·
+            <a href="mailto:${esc(bp.correo)}" style="color:var(--accent);text-decoration:none">${esc(bp.correo)}</a>
+            <span style="margin-left:0.5rem;color:var(--muted)">${fecha}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-shrink:0">
+          <span class="categoria-chip">${esc(bp.categoria)}</span>
+          <span class="status-badge status-${bp.estado}">${bp.estado}</span>
+        </div>
+      </div>
+      <div class="bp-body">${esc(bp.descripcion)}</div>
+      <div class="bp-actions">
+        ${bp.estado !== 'publicado' ? `<button class="btn btn-publish" onclick="cambiarEstado(${realIdx},'publicado')">✓ Publicar</button>` : ''}
+        ${bp.estado !== 'rechazado' ? `<button class="btn btn-reject"  onclick="cambiarEstado(${realIdx},'rechazado')">✗ Rechazar</button>` : ''}
+        ${bp.estado === 'publicado'  ? `<button class="btn btn-reject"  onclick="cambiarEstado(${realIdx},'pendiente')">↩ Volver a pendiente</button>` : ''}
+        <button class="btn btn-delete" onclick="eliminar(${realIdx})">🗑 Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cambiarEstado(idx, nuevoEstado) {
+  const data = getData();
+  if (!data[idx]) return;
+  data[idx].estado = nuevoEstado;
+  saveData(data);
+  renderAdmin();
+  toast(nuevoEstado === 'publicado' ? '✅ Publicado correctamente' : nuevoEstado === 'rechazado' ? '❌ Envío rechazado' : '↩ Movido a pendientes');
+}
+
+function eliminar(idx) {
+  if (!confirm('¿Eliminar este envío definitivamente?')) return;
+  const data = getData();
+  data.splice(idx, 1);
+  saveData(data);
+  renderAdmin();
+  toast('🗑 Eliminado');
+}
+
+function limpiarRechazados() {
+  if (!confirm('¿Eliminar TODOS los envíos rechazados?')) return;
+  const data = getData().filter(d => d.estado !== 'rechazado');
+  saveData(data);
+  renderAdmin();
+  toast('🧹 Rechazados eliminados');
+}
+
+function cambiarTab(tab, btn) {
+  tabActual = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAdmin();
+}
+
+function buscarEnvios(q) { queryBusqueda = q; renderAdmin(); }
+
+// ── EXPORT CSV ──
+function exportarCSV() {
+  const data = getData();
+  if (!data.length) { toast('No hay datos para exportar'); return; }
+  const cols = ['estado','nombre','institucion','correo','categoria','titulo','descripcion','fecha'];
+  const header = cols.join(',');
+  const rows = data.map(d => cols.map(c => `"${(d[c]||'').replace(/"/g,'""')}"`).join(','));
+  const csv  = [header,...rows].join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a'); a.href=url; a.download='cored_buenas_practicas.csv'; a.click();
+  URL.revokeObjectURL(url);
+  toast('📥 CSV exportado');
+}
+
+// ── HELPERS ──
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
