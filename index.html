@@ -447,12 +447,25 @@ document.getElementById('stat-depts').textContent = new Set(DATA.map(d=>d.depart
 const COL = {Alto:'#16a34a', Medio:'#d97706', Bajo:'#dc2626'};
 
 // ── MAPA ──
-const map = L.map('mapa',{zoomControl:true,preferCanvas:true}).setView([15.1,-90.3],7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxZoom:18
-}).addTo(map);
+// Se inicializa después de que el DOM esté completamente listo
+let map, marcadores=[], filtroActivo='todos';
 
-let marcadores=[], filtroActivo='todos';
+function initMap(){
+  if(map) return; // evitar doble init
+  const el = document.getElementById('mapa');
+  if(!el || el.offsetHeight === 0) return;
+
+  map = L.map('mapa', {zoomControl:true, preferCanvas:true}).setView([15.1,-90.3], 7);
+
+  // Dos fuentes de tiles como respaldo
+  const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© <a href="https://carto.com">CARTO</a> © <a href="https://openstreetmap.org">OSM</a>',
+    maxZoom:18, subdomains:'abcd'
+  }).addTo(map);
+
+  // Forzar redibujado de tiles después de cargar
+  setTimeout(()=>{ map.invalidateSize(true); renderMarcadores('todos',''); }, 300);
+}
 
 function mkIcon(color){
   return L.divIcon({
@@ -497,8 +510,6 @@ function renderMarcadores(filtro, query){
   if(counter) counter.textContent=`${visible.length} coordinadoras`;
 }
 
-renderMarcadores('todos','');
-
 function filtrarMapa(filtro,btn){
   filtroActivo=filtro;
   document.querySelectorAll('.map-filter-btn').forEach(b=>b.classList.remove('active'));
@@ -515,6 +526,19 @@ function buscarEnMapa(q){
 const tooltipStyle=document.createElement('style');
 tooltipStyle.textContent=`.leaflet-tooltip-cored{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:0.5rem 0.75rem;font-family:'Sora',sans-serif;font-size:0.8rem;color:#0f172a;box-shadow:0 4px 16px rgba(15,45,94,0.15);white-space:nowrap;}.leaflet-tooltip-cored::before{display:none;}`;
 document.head.appendChild(tooltipStyle);
+
+// ── INICIALIZAR MAPA ──
+// 1) Al cargar la página
+window.addEventListener('load', initMap);
+// 2) Con IntersectionObserver: arranca cuando el div #mapa entra a la pantalla
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ initMap(); obs.disconnect(); }});
+  },{threshold:0.1});
+  obs.observe(document.getElementById('mapa'));
+}
+// 3) Respaldo por si acaso
+setTimeout(initMap, 1500);
 
 // ── RANKING FORTALECIMIENTO ──
 const top=([...DATA].sort((a,b)=>b.temas_fortalecimiento-a.temas_fortalecimiento)).slice(0,10);
