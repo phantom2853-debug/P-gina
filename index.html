@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Coordinadoras para la Reducción de Desastres</title>
+  <title>CORED — Coordinadoras para la Reducción de Desastres</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -249,11 +249,74 @@
     .popup-key{color:var(--muted);}
     .popup-val{font-weight:700;color:var(--navy);}
 
+    /* ── MULTIMEDIA ── */
+    .media-tabs{display:flex;gap:0.25rem;border-bottom:2px solid var(--border);margin-bottom:2.5rem;}
+    .media-tab{
+      font-size:0.8rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+      padding:0.6rem 1.4rem;background:transparent;border:none;border-bottom:3px solid transparent;
+      color:var(--muted);cursor:pointer;transition:all 0.2s;margin-bottom:-2px;
+    }
+    .media-tab.active{color:var(--navy);border-bottom-color:var(--navy);}
+    .media-tab:hover{color:var(--navy);}
+    .media-panel{display:none;}
+    .media-panel.active{display:block;}
+
+    /* Imágenes */
+    .img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;}
+    .img-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;}
+    .img-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(15,45,94,0.1);}
+    .img-card img{width:100%;height:200px;object-fit:cover;display:block;}
+    .img-card-body{padding:0.9rem 1.1rem;}
+    .img-card-title{font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:0.25rem;}
+    .img-card-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+
+    /* Videos YouTube */
+    .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+    .video-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;}
+    .video-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(15,45,94,0.1);}
+    .video-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;}
+    .video-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+    .video-card-body{padding:0.9rem 1.1rem;}
+    .video-card-title{font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:0.25rem;}
+    .video-card-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+
+    /* Documentos */
+    .doc-list{display:flex;flex-direction:column;gap:0.75rem;}
+    .doc-card{
+      background:var(--surface);border:1px solid var(--border);border-radius:10px;
+      padding:1.1rem 1.5rem;display:flex;align-items:center;gap:1.25rem;
+      text-decoration:none;color:inherit;
+      transition:border-color 0.2s,transform 0.15s,box-shadow 0.2s;
+    }
+    .doc-card:hover{border-color:var(--accent2);transform:translateX(4px);box-shadow:0 4px 16px rgba(29,78,216,0.08);}
+    .doc-icon{font-size:2rem;flex-shrink:0;}
+    .doc-info{flex:1;min-width:0;}
+    .doc-title{font-size:0.92rem;font-weight:700;color:var(--navy);margin-bottom:0.2rem;}
+    .doc-meta{font-size:0.75rem;color:var(--muted);}
+    .doc-badge{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:0.2rem 0.6rem;border-radius:5px;background:rgba(29,78,216,0.1);color:var(--accent);border:1px solid rgba(29,78,216,0.2);flex-shrink:0;}
+    .media-empty{text-align:center;padding:3.5rem 1rem;color:var(--muted);}
+    .media-empty-icon{font-size:3rem;margin-bottom:0.75rem;}
+    .media-empty-text{font-size:0.9rem;line-height:1.6;}
+    .media-empty code{font-family:'IBM Plex Mono',monospace;font-size:0.82em;background:var(--bg2);padding:0.1rem 0.4rem;border-radius:4px;color:var(--navy);}
+
+    /* ── BUENAS PRÁCTICAS PUBLICADAS ── */
+    .bp-pub-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;display:flex;gap:1.1rem;align-items:flex-start;transition:border-color 0.2s,box-shadow 0.2s;}
+    .bp-pub-card:hover{border-color:var(--accent2);box-shadow:0 4px 16px rgba(29,78,216,0.08);}
+    .bp-pub-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.95rem;color:#fff;flex-shrink:0;}
+    .bp-pub-meta{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.4rem;}
+    .bp-pub-name{font-weight:700;font-size:0.88rem;color:var(--navy);}
+    .bp-pub-inst{font-size:0.75rem;color:var(--muted);}
+    .bp-pub-date{font-size:0.72rem;color:var(--muted2);margin-left:auto;}
+    .bp-pub-title{font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:0.4rem;}
+    .bp-pub-body{font-size:0.85rem;color:var(--muted);line-height:1.7;}
+    .bp-pub-list{display:flex;flex-direction:column;gap:1rem;margin-top:2rem;}
+
     @media(max-width:700px){
       .ftl-grid,.form-row{grid-template-columns:1fr;}
       .nav-links{display:none;}
       .ftl-bar-wrap{display:none;}
       #navbar{padding:0 1rem;}
+      .bp-pub-date{margin-left:0;}
     }
   </style>
 </head>
@@ -264,7 +327,7 @@
   <div class="logo-wrap">
     <div class="logo-shield">🛡</div>
     <div>
-      <div class="logo-text">Coordinadoras</div>
+      <div class="logo-text">CORED</div>
       <div class="logo-sub">Coordinadoras para la Reducción de Desastres</div>
     </div>
   </div>
@@ -272,6 +335,7 @@
     <li><a href="#inicio"           class="active">Inicio</a></li>
     <li><a href="#mapa-section">Mapa</a></li>
     <li><a href="#fortalecimiento">Fortalecimiento</a></li>
+    <li><a href="#multimedia">Multimedia</a></li>
     <li><a href="#buenas-practicas">Buenas Prácticas</a></li>
   </ul>
 </nav>
@@ -281,9 +345,10 @@
   <div class="hero-dots"></div>
   <div class="hero-glow"></div>
   <div class="alert-badge">
+    <span class="alert-dot"></span>Sistema activo — Nivel de alerta: Amarillo
   </div>
-  <h1 class="hero-title">Coordinadoras para la Reducción de Riesgos<br><span>
-  <p class="hero-sub">Plataforma de información para la prevención, mitigación y respuesta ante desastres.</p>
+  <h1 class="hero-title">Reducción de Riesgos<br><span>Coordinada y Eficaz</span></h1>
+  <p class="hero-sub">Plataforma nacional de coordinación interinstitucional para la prevención, mitigación y respuesta ante desastres naturales y antrópicos.</p>
   <div class="hero-cta">
     <a href="#mapa-section" class="btn-primary">Ver Mapa Interactivo</a>
     <a href="#buenas-practicas" class="btn-secondary">Enviar Buena Práctica</a>
@@ -305,13 +370,13 @@
 <section class="section" id="contenido-general">
   <p class="section-tag">// Contenido General</p>
   <h2 class="section-title">Sistema de <span>Coordinadoras</span></h2>
-  <p class="section-desc">Coordinadoras orientadas a la gestión integral del riesgo de desastres en el territorio nacional.</p>
+  <p class="section-desc">Red jerarquizada de instituciones públicas, privadas y comunitarias orientadas a la gestión integral del riesgo de desastres en el territorio nacional.</p>
   <div class="cards-grid">
-    <div class="card"><div class="card-line"></div><div class="card-icon">🏛️</div><div class="card-title">Marco Legal</div><div class="card-text">Decreto 109-96 y sus reformas establecen la estructura de la Coordinadora Nacional para la Reducción de Desastres con coordinadoras en cuatro niveles territoriales.</div></div>
-    <div class="card"><div class="card-line"></div><div class="card-icon">🌐</div><div class="card-title">Estructura Territorial</div><div class="card-text">Coordinadoras Regionales, departamentales, municipales y locales que conforman un sistema de prevención y respuesta.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">🏛️</div><div class="card-title">Marco Legal</div><div class="card-text">Decreto 109-96 y sus reformas establecen la estructura del Sistema Nacional de Reducción de Desastres con coordinadoras en cuatro niveles territoriales.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">🌐</div><div class="card-title">Estructura Territorial</div><div class="card-text">Coordinadoras nacionales, regionales, departamentales, municipales y locales conforman una red integrada de respuesta y prevención.</div></div>
     <div class="card"><div class="card-line"></div><div class="card-icon">📡</div><div class="card-title">Sistema de Alerta</div><div class="card-text">Monitoreo continuo de amenazas volcánicas, sísmicas, hidrometeorológicas y tecnológicas con protocolos de alerta a cada nivel.</div></div>
-    <div class="card"><div class="card-line"></div><div class="card-icon">🤝</div><div class="card-title">Interinstitucionalidad</div><div class="card-text">Articulación de instituciones presentes en el teeritorio, ONGs, empresa privada y comunidades en torno a la gestión del riesgo de desastres.</div></div>
-    <div class="card"><div class="card-line"></div><div class="card-icon">🎓</div><div class="card-title">Formación Continua</div><div class="card-text">Programas de capacitación, simulacros y formación de sus integrnates en todo el territorio.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">🤝</div><div class="card-title">Interinstitucionalidad</div><div class="card-text">Articulación de instituciones del Estado, ONGs, empresa privada y comunidades en torno a la gestión del riesgo de desastres.</div></div>
+    <div class="card"><div class="card-line"></div><div class="card-icon">🎓</div><div class="card-title">Formación Continua</div><div class="card-text">Programas de capacitación técnica, simulacros nacionales y formación de brigadistas comunitarios en todo el territorio.</div></div>
     <div class="card"><div class="card-line"></div><div class="card-icon">📊</div><div class="card-title">Evaluación y Mejora</div><div class="card-text">Sistema de indicadores de desempeño para medir la efectividad de las coordinadoras y guiar planes de fortalecimiento.</div></div>
   </div>
 </section>
@@ -344,9 +409,9 @@
 <!-- ═══ FORTALECIMIENTO ═══ -->
 <hr class="divider"/>
 <section class="section" id="fortalecimiento">
-  <p class="section-tag">// Fortalecimiento de las Coordinadoras</p>
+  <p class="section-tag">// Fortalecimiento Institucional</p>
   <h2 class="section-title">Coordinadoras con más <span>Temas a Favor</span></h2>
-  <p class="section-desc">Escala generada automáticamente desde la matriz. Las coordinadoras con mayor número de temas de fortalecimiento activos aparecen primero.</p>
+  <p class="section-desc">Ranking generado automáticamente desde la matriz. Las coordinadoras con mayor número de temas de fortalecimiento activos aparecen primero.</p>
   <div class="ftl-rank-grid" id="ftl-ranking"></div>
 
   <h3 style="font-size:1.15rem;font-weight:800;color:var(--navy);margin:4rem 0 0.5rem;">Ejes Estratégicos</h3>
@@ -359,15 +424,183 @@
   </div>
 </section>
 
+<!-- ═══ MULTIMEDIA ═══ -->
+<hr class="divider"/>
+<section class="section" id="multimedia">
+  <p class="section-tag">// Recursos Multimedia</p>
+  <h2 class="section-title">Galería de <span>Recursos</span></h2>
+  <p class="section-desc">Imágenes, videos y documentos del sistema de coordinadoras. Para agregar contenido, edita el archivo <code style="font-family:'IBM Plex Mono',monospace;font-size:0.85em;color:var(--accent)">index.html</code> siguiendo las instrucciones en cada sección.</p>
+
+  <!-- TABS -->
+  <div class="media-tabs" style="margin-top:2.5rem;">
+    <button class="media-tab active" onclick="mediaTab('imagenes',this)">🖼️ Imágenes</button>
+    <button class="media-tab"        onclick="mediaTab('videos',this)">▶️ Videos</button>
+    <button class="media-tab"        onclick="mediaTab('documentos',this)">📄 Documentos</button>
+  </div>
+
+  <!-- ── PANEL: IMÁGENES ── -->
+  <div class="media-panel active" id="panel-imagenes">
+    <div class="img-grid">
+
+      <!--
+      ════════════════════════════════════════════════════════
+      CÓMO AGREGAR UNA IMAGEN:
+      1. Sube el archivo al repositorio de GitHub
+         (Add file → Upload files)
+      2. Copia el bloque de abajo, pégalo aquí y edita:
+         - src="nombre-del-archivo.jpg"   (nombre exacto del archivo subido)
+         - El título y descripción
+
+      EJEMPLO con imagen subida al repo:
+      <div class="img-card">
+        <img src="simulacro-zacapa.jpg" alt="Simulacro en Zacapa"/>
+        <div class="img-card-body">
+          <div class="img-card-title">Simulacro departamental Zacapa</div>
+          <div class="img-card-desc">Ejercicio de evacuación realizado en marzo 2024.</div>
+        </div>
+      </div>
+
+      EJEMPLO con imagen de internet (URL directa):
+      <div class="img-card">
+        <img src="https://ejemplo.com/foto.jpg" alt="descripción"/>
+        <div class="img-card-body">
+          <div class="img-card-title">Título de la imagen</div>
+          <div class="img-card-desc">Descripción breve.</div>
+        </div>
+      </div>
+      ════════════════════════════════════════════════════════
+      -->
+
+      <!-- IMAGEN DE EJEMPLO — borra este bloque cuando agregues las tuyas -->
+      <div class="img-card">
+        <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80" alt="Coordinación de emergencias"/>
+        <div class="img-card-body">
+          <div class="img-card-title">Ejemplo — Coordinación de emergencias</div>
+          <div class="img-card-desc">Reemplaza esta imagen subiendo tus propias fotos al repositorio.</div>
+        </div>
+      </div>
+      <div class="img-card">
+        <img src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=600&q=80" alt="Simulacro comunitario"/>
+        <div class="img-card-body">
+          <div class="img-card-title">Ejemplo — Simulacro comunitario</div>
+          <div class="img-card-desc">Agrega aquí tus propias fotografías de actividades.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PANEL: VIDEOS ── -->
+  <div class="media-panel" id="panel-videos">
+    <div class="video-grid">
+
+      <!--
+      ════════════════════════════════════════════════════════
+      CÓMO AGREGAR UN VIDEO DE YOUTUBE:
+      1. Abre el video en YouTube
+      2. Clic en "Compartir" → "Insertar"
+      3. Copia solo el ID del video (los 11 caracteres después de "embed/")
+         Ejemplo: https://www.youtube.com/embed/dQw4w9WgXcQ
+                                                 ↑ este es el ID
+      4. Copia el bloque de abajo y pega el ID donde dice ID_DEL_VIDEO
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/ID_DEL_VIDEO"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-card-body">
+          <div class="video-card-title">Título del video</div>
+          <div class="video-card-desc">Descripción breve del contenido.</div>
+        </div>
+      </div>
+      ════════════════════════════════════════════════════════
+      -->
+
+      <!-- VIDEO DE EJEMPLO — reemplaza el ID con el tuyo -->
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-card-body">
+          <div class="video-card-title">Ejemplo — Reemplaza con tu video</div>
+          <div class="video-card-desc">Copia el ID de tu video de YouTube y pégalo en el src del iframe.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PANEL: DOCUMENTOS ── -->
+  <div class="media-panel" id="panel-documentos">
+    <div class="doc-list">
+
+      <!--
+      ════════════════════════════════════════════════════════
+      CÓMO AGREGAR UN DOCUMENTO:
+      1. Sube el PDF al repositorio de GitHub (Add file → Upload files)
+      2. Copia el bloque de abajo y edita:
+         - href="nombre-del-archivo.pdf"   (nombre exacto del archivo)
+         - El ícono, título, descripción y tipo
+
+      ÍCONOS SUGERIDOS:
+        📄 PDF genérico    📊 Informe / Excel
+        📋 Plan / Manual   🗺️ Mapa
+        📰 Boletín         📌 Resolución
+
+      EJEMPLO:
+      <a class="doc-card" href="plan-respuesta-2024.pdf" target="_blank">
+        <div class="doc-icon">📋</div>
+        <div class="doc-info">
+          <div class="doc-title">Plan Municipal de Respuesta 2024</div>
+          <div class="doc-meta">PDF · 2.4 MB · Actualizado enero 2024</div>
+        </div>
+        <div class="doc-badge">PDF</div>
+      </a>
+      ════════════════════════════════════════════════════════
+      -->
+
+      <!-- DOCUMENTOS DE EJEMPLO — reemplaza con los tuyos -->
+      <a class="doc-card" href="#" target="_blank">
+        <div class="doc-icon">📋</div>
+        <div class="doc-info">
+          <div class="doc-title">Ejemplo — Plan Municipal de Respuesta</div>
+          <div class="doc-meta">Sube tu PDF al repositorio y cambia href="#" por el nombre del archivo</div>
+        </div>
+        <div class="doc-badge">PDF</div>
+      </a>
+      <a class="doc-card" href="#" target="_blank">
+        <div class="doc-icon">📊</div>
+        <div class="doc-info">
+          <div class="doc-title">Ejemplo — Informe de Actividades</div>
+          <div class="doc-meta">Sube tu documento y actualiza este bloque con el nombre real</div>
+        </div>
+        <div class="doc-badge">PDF</div>
+      </a>
+      <a class="doc-card" href="#" target="_blank">
+        <div class="doc-icon">🗺️</div>
+        <div class="doc-info">
+          <div class="doc-title">Ejemplo — Mapa de Riesgos</div>
+          <div class="doc-meta">Puedes enlazar también documentos externos con su URL completa</div>
+        </div>
+        <div class="doc-badge">PDF</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
 <!-- ═══ BUENAS PRÁCTICAS ═══ -->
 <hr class="divider"/>
 <section class="section" id="buenas-practicas">
   <p class="section-tag">// Buenas Prácticas</p>
   <h2 class="section-title">Envía tu <span>Buena Práctica</span></h2>
-  <p class="section-desc">Comparte tu experiencia. El equipo revisará tu aporte y solo publicará las prácticas que cumplan los criterios de calidad.</p>
+  <p class="section-desc">Comparte tu experiencia. El equipo técnico revisará tu aporte y solo publicará las prácticas que cumplan los criterios de calidad.</p>
 
+  <!-- FORMULARIO DE ENVÍO -->
   <div class="bp-wrap" style="margin-top:2.5rem;">
-    <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin:0 0 1.5rem;">Formulario de envío</h3>
+    <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin:0 0 1.5rem;">📨 Formulario de envío</h3>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label" for="bp-nombre">Nombre completo</label>
@@ -402,7 +635,7 @@
     </div>
     <button class="submit-btn" id="bp-submit" onclick="enviarPractica()">Enviar para revisión ▸</button>
     <div class="bp-note">
-      ⚠️ <strong>Nota:</strong> Tu aporte será revisado por el equipo antes de ser publicado. Solo se publicarán prácticas que cumplan con los criterios de calidad y relevancia. Recibirás respuesta al correo indicado en un plazo de 5 días hábiles.
+      ⚠️ <strong>Nota:</strong> Tu aporte será revisado por el equipo técnico antes de ser publicado. Solo se publicarán prácticas que cumplan con los criterios de calidad. Recibirás respuesta en un plazo de 5 días hábiles.
     </div>
     <div class="bp-success" id="bp-success">
       <div class="bp-success-icon">✅</div>
@@ -410,11 +643,22 @@
       <div class="bp-success-text">Tu buena práctica fue registrada. El equipo técnico la revisará y te notificará por correo electrónico.</div>
     </div>
   </div>
+
+  <!-- MURO DE PRÁCTICAS APROBADAS -->
+  <div style="margin-top:4rem;">
+    <h3 style="font-size:1.2rem;font-weight:800;color:var(--navy);margin:0 0 0.4rem;">
+      ✅ Prácticas Aprobadas
+    </h3>
+    <p style="color:var(--muted);font-size:0.85rem;margin:0 0 0;">
+      Aportes revisados y aprobados por el equipo técnico de CORED.
+    </p>
+    <div class="bp-pub-list" id="bp-publicadas"></div>
+  </div>
 </section>
 
 <!-- ═══ FOOTER ═══ -->
 <footer>
-  <p>Sistema de Coordinadoras para la Reducción de Desastres &nbsp;|&nbsp; Guatemala</p>
+  <p>CORED — Sistema Nacional de Coordinadoras para la Reducción de Desastres &nbsp;|&nbsp; Guatemala</p>
   <p style="margin-top:0.5rem;">Sitio informativo · Los datos provienen de la matriz oficial · <a href="consola-admin.html">Consola admin</a></p>
 </footer>
 
@@ -423,7 +667,7 @@
 <script src="datos.js"></script>
 <script>
 // ── NAV SCROLL ACTIVO ──
-const navIds=['inicio','mapa-section','fortalecimiento','buenas-practicas'];
+const navIds=['inicio','mapa-section','fortalecimiento','multimedia','buenas-practicas'];
 window.addEventListener('scroll',()=>{
   const y=window.scrollY+80;
   navIds.forEach(id=>{
@@ -562,7 +806,53 @@ document.getElementById('ftl-ranking').innerHTML=topData.length
   }).join('')
   :`<p style="color:var(--muted);text-align:center;padding:2rem">Sin datos. Edita <code>datos.js</code>.</p>`;
 
-// ── FORMULARIO → FORMSPREE ──
+// ── MULTIMEDIA TABS ──
+function mediaTab(panel, btn){
+  document.querySelectorAll('.media-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.media-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+panel).classList.add('active');
+}
+
+// ── BUENAS PRÁCTICAS PUBLICADAS ──
+// Lee del localStorage las que el admin aprobó en la consola
+const BP_KEY = 'cored_bp_inbox_v1';
+function renderPublicadas(){
+  const container = document.getElementById('bp-publicadas');
+  if(!container) return;
+  let todas = [];
+  try{ todas = JSON.parse(localStorage.getItem(BP_KEY)) || []; }catch{}
+  const aprobadas = todas.filter(b=>b.estado==='publicado');
+  if(!aprobadas.length){
+    container.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--muted);">
+      <div style="font-size:2.5rem;margin-bottom:0.75rem">💬</div>
+      <p style="font-size:0.9rem">Aún no hay buenas prácticas publicadas.</p>
+    </div>`;
+    return;
+  }
+  const colores={Prevención:'#1d4ed8',Preparación:'#7c3aed',Respuesta:'#dc2626',Recuperación:'#16a34a',Comunicación:'#d97706',Capacitación:'#0891b2'};
+  container.innerHTML = aprobadas.slice().reverse().map(bp=>{
+    const ini=(bp.nombre||'?').trim().split(' ').map(p=>p[0]||'').join('').slice(0,2).toUpperCase();
+    const color=colores[bp.categoria]||'var(--navy)';
+    const fecha=bp.fecha?new Date(bp.fecha).toLocaleDateString('es-GT',{day:'2-digit',month:'short',year:'numeric'}):'';
+    return `<div class="bp-pub-card">
+      <div class="bp-pub-avatar" style="background:${color}">${ini}</div>
+      <div style="flex:1;min-width:0">
+        <div class="bp-pub-meta">
+          <span class="bp-pub-name">${esc(bp.nombre)}</span>
+          <span class="bp-pub-inst">${esc(bp.institucion)}</span>
+          <span class="badge" style="background:${color}18;color:${color};border:1px solid ${color}33">${esc(bp.categoria)}</span>
+          <span class="bp-pub-date">${fecha}</span>
+        </div>
+        <div class="bp-pub-title">${esc(bp.titulo)}</div>
+        <div class="bp-pub-body">${esc(bp.descripcion)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+renderPublicadas();
+
 async function enviarPractica(){
   const campos={
     nombre:      document.getElementById('bp-nombre').value.trim(),
