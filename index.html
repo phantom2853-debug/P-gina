@@ -1,723 +1,538 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Coordinadoras para la Reducción de Desastres</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <style>
-    :root{
-      --bg:#f0f4f8;
-      --bg2:#e2e8f0;
-      --surface:#ffffff;
-      --surface2:#f8fafc;
-      --border:#cbd5e1;
-      --border2:#94a3b8;
-      --navy:#0f2d5e;
-      --navy2:#1e4080;
-      --navy3:#2d5499;
-      --accent:#1d4ed8;
-      --accent2:#3b82f6;
-      --text:#0f172a;
-      --muted:#475569;
-      --muted2:#64748b;
-      --alto:#16a34a;
-      --medio:#d97706;
-      --bajo:#dc2626;
-    }
-    *{box-sizing:border-box;}
-    html{scroll-behavior:smooth;}
-    body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;margin:0;overflow-x:hidden;}
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sistema de Coordinadoras para la Reducción de Desastres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{
+  --bg:#f0f4f8; --bg2:#e2e8f0; --surface:#ffffff; --surface2:#f8fafc;
+  --border:#cbd5e1; --border2:#94a3b8;
+  --navy:#0f2d5e; --navy2:#1e4080; --navy3:#2d5499;
+  --accent:#1d4ed8; --accent2:#3b82f6;
+  --text:#0f172a; --muted:#475569; --muted2:#64748b;
+  --alto:#16a34a; --medio:#d97706; --bajo:#dc2626;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;margin:0;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column;}
 
-    /* ── NAVBAR ── */
-    #navbar{
-      position:fixed;top:0;left:0;right:0;z-index:100;
-      background:var(--navy);
-      border-bottom:3px solid var(--accent2);
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 2.5rem;height:66px;
-      box-shadow:0 2px 20px rgba(15,45,94,0.18);
-    }
-    .logo-wrap{display:flex;align-items:center;gap:0.9rem;}
-    .logo-shield{
-      width:40px;height:40px;background:white;border-radius:8px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:1.3rem;font-weight:900;color:var(--navy);flex-shrink:0;
-    }
-    .logo-text{font-size:1.3rem;font-weight:800;color:#ffffff;letter-spacing:-0.01em;}
-    .logo-sub{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.55);letter-spacing:0.12em;margin-top:0.1rem;}
-    .nav-links{display:flex;gap:0.15rem;list-style:none;margin:0;padding:0;}
-    .nav-links a{
-      display:inline-block;padding:0.5rem 1.1rem;
-      font-size:0.8rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;
-      color:rgba(255,255,255,0.7);text-decoration:none;border-radius:6px;
-      transition:color 0.2s,background 0.2s;
-    }
-    .nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.15);}
+/* NAVBAR */
+#navbar{position:sticky;top:0;left:0;right:0;z-index:100;background:var(--navy);border-bottom:3px solid var(--accent2);display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:66px;box-shadow:0 2px 20px rgba(15,45,94,0.18);}
+.logo-wrap{display:flex;align-items:center;gap:0.9rem;text-decoration:none;cursor:pointer;background:none;border:none;}
+.logo-shield{width:40px;height:40px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.logo-text{font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-0.01em;text-align:left;}
+.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.55);letter-spacing:0.1em;margin-top:0.1rem;}
+.nav-links{display:flex;gap:0.15rem;list-style:none;margin:0;padding:0;}
+.nav-btn{display:inline-block;padding:0.5rem 1.1rem;font-size:0.8rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:rgba(255,255,255,0.7);text-decoration:none;border-radius:6px;transition:color 0.2s,background 0.2s;background:none;border:none;cursor:pointer;font-family:'Sora',sans-serif;}
+.nav-btn:hover,.nav-btn.active{color:#fff;background:rgba(255,255,255,0.15);}
 
-    /* ── HERO ── */
-    #inicio{
-      min-height:100vh;padding-top:66px;
-      background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 55%,var(--navy3) 100%);
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      text-align:center;padding-left:1.5rem;padding-right:1.5rem;
-      position:relative;overflow:hidden;
-    }
-    .hero-dots{
-      position:absolute;inset:0;
-      background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);
-      background-size:32px 32px;
-    }
-    .hero-glow{
-      position:absolute;bottom:-120px;left:50%;transform:translateX(-50%);
-      width:800px;height:400px;border-radius:50%;
-      background:radial-gradient(ellipse,rgba(59,130,246,0.18) 0%,transparent 70%);
-      pointer-events:none;
-    }
-    .alert-badge{
-      display:inline-flex;align-items:center;gap:0.5rem;position:relative;z-index:1;
-      font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;
-      background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);
-      color:rgba(255,255,255,0.9);border-radius:100px;padding:0.3rem 1rem;margin-bottom:2rem;
-    }
-    .alert-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite;}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
-    .hero-title{
-      font-size:clamp(2.4rem,6vw,4.8rem);font-weight:800;letter-spacing:-0.03em;
-      line-height:1.1;max-width:800px;margin-bottom:1.5rem;color:#ffffff;
-      position:relative;z-index:1;
-    }
-    .hero-title span{
-      background:linear-gradient(90deg,#60a5fa,#a5f3fc);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    }
-    .hero-sub{
-      max-width:560px;font-size:1.02rem;color:rgba(255,255,255,0.72);
-      line-height:1.75;margin-bottom:2.5rem;position:relative;z-index:1;
-    }
-    .hero-cta{display:inline-flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;}
-    .btn-primary{
-      background:#ffffff;color:var(--navy);font-weight:700;font-size:0.84rem;
-      letter-spacing:0.04em;text-transform:uppercase;padding:0.85rem 2.2rem;
-      border-radius:8px;text-decoration:none;border:none;cursor:pointer;
-      transition:transform 0.15s,box-shadow 0.15s;display:inline-block;
-    }
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.2);}
-    .btn-secondary{
-      background:transparent;color:#fff;font-weight:600;font-size:0.84rem;
-      letter-spacing:0.04em;text-transform:uppercase;padding:0.85rem 2.2rem;
-      border-radius:8px;text-decoration:none;border:2px solid rgba(255,255,255,0.4);
-      transition:border-color 0.2s,background 0.2s;cursor:pointer;display:inline-block;
-    }
-    .btn-secondary:hover{border-color:#fff;background:rgba(255,255,255,0.08);}
+/* PAGE / VIEW SECTIONS */
+.vista{display:none;}
+.vista.active{display:block;}
+main{flex:1;}
 
-    .stats-bar{
-      display:flex;flex-wrap:wrap;gap:0;margin:3.5rem auto 0;max-width:440px;width:100%;
-      background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
-      border-radius:14px;overflow:hidden;position:relative;z-index:1;
-    }
-    .stat-item{flex:1;min-width:160px;padding:1.4rem 1.5rem;text-align:center;}
-    .stat-item+.stat-item{border-left:1px solid rgba(255,255,255,0.15);}
-    .stat-value{font-size:2.2rem;font-weight:800;color:#ffffff;line-height:1;}
-    .stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);margin-top:0.4rem;}
+.page-hero{background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 55%,var(--navy3) 100%);padding:3.5rem 1.5rem 3rem;text-align:center;position:relative;overflow:hidden;}
+.page-hero-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);background-size:32px 32px;}
+.page-tag{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:#93c5fd;margin-bottom:0.6rem;position:relative;z-index:1;}
+.page-title{font-size:clamp(1.9rem,4.5vw,3rem);font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 0.75rem;position:relative;z-index:1;}
+.page-title span{background:linear-gradient(90deg,#60a5fa,#a5f3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.page-desc{max-width:600px;margin:0 auto;color:rgba(255,255,255,0.72);line-height:1.7;font-size:0.95rem;position:relative;z-index:1;}
 
-    /* ── SECTIONS ── */
-    .section{padding:5rem 1.5rem;max-width:1100px;margin:0 auto;}
-    .section-tag{
-      font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.18em;
-      text-transform:uppercase;color:var(--accent);margin-bottom:0.6rem;
-    }
-    .section-title{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-0.02em;line-height:1.2;margin:0 0 0.9rem;color:var(--navy);}
-    .section-title span{color:var(--accent);}
-    .section-desc{max-width:560px;color:var(--muted);line-height:1.75;font-size:0.94rem;}
-    .divider{border:none;border-top:2px solid var(--border);margin:0;}
+/* INICIO HERO (más grande, con CTA y stats) */
+#inicio-hero{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.5rem 1.5rem;position:relative;overflow:hidden;background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 55%,var(--navy3) 100%);}
+.hero-glow{position:absolute;bottom:-120px;left:50%;transform:translateX(-50%);width:800px;height:400px;border-radius:50%;background:radial-gradient(ellipse,rgba(59,130,246,0.18) 0%,transparent 70%);pointer-events:none;}
+.alert-badge{display:inline-flex;align-items:center;gap:0.5rem;position:relative;z-index:1;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:100px;padding:0.3rem 1rem;margin-bottom:2rem;}
+.alert-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hero-title{font-size:clamp(2.2rem,5.5vw,4.2rem);font-weight:800;letter-spacing:-0.03em;line-height:1.1;max-width:780px;margin-bottom:1.5rem;color:#fff;position:relative;z-index:1;}
+.hero-title span{background:linear-gradient(90deg,#60a5fa,#a5f3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-sub{max-width:560px;font-size:1.02rem;color:rgba(255,255,255,0.72);line-height:1.75;margin-bottom:2.5rem;position:relative;z-index:1;}
+.hero-cta{display:inline-flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;}
+.stats-bar{display:flex;flex-wrap:wrap;gap:0;margin:3rem auto 0;max-width:440px;width:100%;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:14px;overflow:hidden;position:relative;z-index:1;}
+.stat-item{flex:1;min-width:160px;padding:1.4rem 1.5rem;text-align:center;}
+.stat-item+.stat-item{border-left:1px solid rgba(255,255,255,0.15);}
+.stat-value{font-size:2.2rem;font-weight:800;color:#fff;line-height:1;}
+.stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);margin-top:0.4rem;}
 
-    /* ── CARDS ── */
-    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;margin-top:3rem;}
-    .card{
-      background:var(--surface);border:1px solid var(--border);border-radius:12px;
-      padding:1.75rem;position:relative;overflow:hidden;
-      transition:border-color 0.25s,transform 0.2s,box-shadow 0.2s;
-    }
-    .card:hover{border-color:var(--accent2);transform:translateY(-3px);box-shadow:0 8px 24px rgba(29,78,216,0.1);}
-    .card-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--accent2));transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
-    .card:hover .card-line{transform:scaleX(1);}
-    .card-icon{font-size:2rem;margin-bottom:1rem;}
-    .card-title{font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--navy);}
-    .card-text{font-size:0.84rem;color:var(--muted);line-height:1.65;}
+.section{padding:3.5rem 1.5rem;max-width:1100px;margin:0 auto;}
+.section-tag{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:0.6rem;}
+.section-title{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;letter-spacing:-0.02em;line-height:1.2;margin:0 0 0.9rem;color:var(--navy);}
+.section-title span{color:var(--accent);}
+.section-desc{max-width:560px;color:var(--muted);line-height:1.75;font-size:0.94rem;}
 
-    /* ── MAP ── */
-    #mapa{height:520px;border-radius:12px;overflow:hidden;border:2px solid var(--border);box-shadow:0 4px 20px rgba(15,45,94,0.1);}
-    .map-controls{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
-    .map-filter-btn{
-      font-size:0.75rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;
-      padding:0.45rem 1rem;border-radius:6px;border:2px solid var(--border);
-      background:var(--surface);color:var(--muted);cursor:pointer;transition:all 0.2s;
-    }
-    .map-filter-btn:hover,.map-filter-btn.active{border-color:var(--navy);color:var(--navy);background:var(--bg2);}
-    .map-filter-btn.f-alto.active{border-color:var(--alto);color:var(--alto);background:rgba(22,163,74,0.08);}
-    .map-filter-btn.f-medio.active{border-color:var(--medio);color:var(--medio);background:rgba(217,119,6,0.08);}
-    .map-filter-btn.f-bajo.active{border-color:var(--bajo);color:var(--bajo);background:rgba(220,38,38,0.08);}
-    .map-search{
-      background:var(--surface);border:2px solid var(--border);border-radius:6px;
-      color:var(--text);font-family:'Sora',sans-serif;font-size:0.82rem;
-      padding:0.45rem 0.9rem;outline:none;transition:border-color 0.2s;min-width:220px;
-    }
-    .map-search:focus{border-color:var(--navy);}
-    .map-legend{display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1rem;}
-    .legend-item{display:flex;align-items:center;gap:0.45rem;font-size:0.8rem;color:var(--muted);font-weight:600;}
-    .legend-dot{width:13px;height:13px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.15);}
-    .map-counter{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted2);margin-left:auto;}
+/* Botones genéricos */
+.btn-primary{background:#fff;color:var(--navy);font-weight:700;font-size:0.84rem;letter-spacing:0.04em;text-transform:uppercase;padding:0.85rem 2.2rem;border-radius:8px;text-decoration:none;border:none;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;display:inline-block;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.2);}
+.btn-secondary{background:transparent;color:#fff;font-weight:600;font-size:0.84rem;letter-spacing:0.04em;text-transform:uppercase;padding:0.85rem 2.2rem;border-radius:8px;text-decoration:none;border:2px solid rgba(255,255,255,0.4);transition:border-color 0.2s,background 0.2s;cursor:pointer;display:inline-block;}
+.btn-secondary:hover{border-color:#fff;background:rgba(255,255,255,0.08);}
+.btn-navy{background:var(--navy);color:#fff;font-weight:700;font-size:0.82rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.75rem 1.8rem;border-radius:8px;border:none;cursor:pointer;text-decoration:none;display:inline-block;transition:background 0.2s,transform 0.15s,box-shadow 0.15s;}
+.btn-navy:hover{background:var(--navy2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,45,94,0.25);}
+.btn-navy:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
 
-    /* ── BADGE ── */
-    .badge{display:inline-block;font-size:0.68rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:0.22rem 0.6rem;border-radius:5px;}
-    .badge-alto {background:rgba(22,163,74,0.12);color:#15803d;border:1px solid rgba(22,163,74,0.3);}
-    .badge-medio{background:rgba(217,119,6,0.12);color:#b45309;border:1px solid rgba(217,119,6,0.3);}
-    .badge-bajo {background:rgba(220,38,38,0.12);color:#b91c1c;border:1px solid rgba(220,38,38,0.3);}
+/* Cards */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;margin-top:2.5rem;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.75rem;position:relative;overflow:hidden;transition:border-color 0.25s,transform 0.2s,box-shadow 0.2s;}
+.card:hover{border-color:var(--accent2);transform:translateY(-3px);box-shadow:0 8px 24px rgba(29,78,216,0.1);}
+.card-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--accent2));transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
+.card:hover .card-line{transform:scaleX(1);}
+.card-icon{font-size:2rem;margin-bottom:1rem;}
+.card-title{font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--navy);}
+.card-text{font-size:0.84rem;color:var(--muted);line-height:1.65;}
 
-    /* ── FORTALECIMIENTO RANKING ── */
-    .ftl-rank-grid{display:grid;gap:0.6rem;margin-top:2rem;}
-    .ftl-rank-card{
-      background:var(--surface);border:1px solid var(--border);border-radius:10px;
-      padding:1rem 1.5rem;display:flex;align-items:center;gap:1.25rem;
-      transition:border-color 0.2s,transform 0.15s,box-shadow 0.2s;
-    }
-    .ftl-rank-card:hover{border-color:var(--accent2);transform:translateX(4px);box-shadow:0 4px 16px rgba(29,78,216,0.08);}
-    .ftl-rank-pos{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:1.2rem;color:var(--navy);min-width:36px;}
-    .ftl-rank-info{flex:1;min-width:0;}
-    .ftl-rank-name{font-weight:700;font-size:0.9rem;color:var(--navy);}
-    .ftl-rank-dept{font-size:0.73rem;color:var(--muted2);margin-top:0.15rem;}
-    .ftl-bar-wrap{flex:0 0 160px;}
-    .ftl-bar{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:0.25rem;}
-    .ftl-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--navy),var(--accent2));}
-    .ftl-bar-pts{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--accent);}
+.badge{display:inline-block;font-size:0.68rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:0.22rem 0.6rem;border-radius:5px;}
+.badge-alto{background:rgba(22,163,74,0.12);color:#15803d;border:1px solid rgba(22,163,74,0.3);}
+.badge-medio{background:rgba(217,119,6,0.12);color:#b45309;border:1px solid rgba(217,119,6,0.3);}
+.badge-bajo{background:rgba(220,38,38,0.12);color:#b91c1c;border:1px solid rgba(220,38,38,0.3);}
 
-    /* ── FORTALECIMIENTO EJES ── */
-    .ftl-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem;}
-    .ftl-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.75rem;position:relative;overflow:hidden;}
-    .ftl-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--navy),var(--accent2));}
-    .ftl-num{font-family:'IBM Plex Mono',monospace;font-size:3.5rem;font-weight:800;position:absolute;top:0.75rem;right:1.25rem;color:rgba(15,45,94,0.05);line-height:1;pointer-events:none;}
-    .ftl-title{font-size:1rem;font-weight:700;margin-bottom:0.65rem;color:var(--navy);}
-    .ftl-text{font-size:0.84rem;color:var(--muted);line-height:1.7;}
-    .ftl-list{list-style:none;padding:0;margin:0.75rem 0 0;}
-    .ftl-list li{font-size:0.83rem;color:var(--muted);padding:0.3rem 0;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;align-items:flex-start;}
-    .ftl-list li:last-child{border-bottom:none;}
-    .ftl-list li::before{content:'▸';color:var(--accent);flex-shrink:0;margin-top:0.05rem;}
+/* MAPA */
+#mapa{height:520px;border-radius:12px;overflow:hidden;border:2px solid var(--border);box-shadow:0 4px 20px rgba(15,45,94,0.1);}
+.map-controls{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
+.map-filter-btn{font-size:0.75rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:0.45rem 1rem;border-radius:6px;border:2px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.map-filter-btn:hover,.map-filter-btn.active{border-color:var(--navy);color:var(--navy);background:var(--bg2);}
+.map-filter-btn.f-alto.active{border-color:var(--alto);color:var(--alto);background:rgba(22,163,74,0.08);}
+.map-filter-btn.f-medio.active{border-color:var(--medio);color:var(--medio);background:rgba(217,119,6,0.08);}
+.map-filter-btn.f-bajo.active{border-color:var(--bajo);color:var(--bajo);background:rgba(220,38,38,0.08);}
+.map-search{background:var(--surface);border:2px solid var(--border);border-radius:6px;color:var(--text);font-family:'Sora',sans-serif;font-size:0.82rem;padding:0.45rem 0.9rem;outline:none;transition:border-color 0.2s;min-width:220px;}
+.map-search:focus{border-color:var(--navy);}
+.map-legend{display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1rem;}
+.legend-item{display:flex;align-items:center;gap:0.45rem;font-size:0.8rem;color:var(--muted);font-weight:600;}
+.legend-dot{width:13px;height:13px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.15);}
+.map-counter{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted2);margin-left:auto;}
+.leaflet-popup-content-wrapper{background:#fff;border-radius:10px;border:1px solid var(--border);box-shadow:0 8px 24px rgba(15,45,94,0.15);padding:0;}
+.leaflet-popup-content{margin:0;padding:0;}
+.popup-inner{padding:1rem 1.1rem;min-width:200px;}
+.popup-name{font-weight:700;color:var(--navy);font-size:0.92rem;margin-bottom:0.2rem;}
+.popup-loc{font-size:0.75rem;color:var(--muted2);margin-bottom:0.6rem;}
+.popup-row{display:flex;justify-content:space-between;font-size:0.78rem;padding:0.2rem 0;border-top:1px solid var(--border);}
+.popup-key{color:var(--muted);}
+.popup-val{font-weight:700;color:var(--navy);}
+.popup-pdf-btn{display:block;width:100%;margin-top:0.6rem;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:0.4rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;}
+.leaflet-tooltip-cored{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:0.5rem 0.75rem;font-family:'Sora',sans-serif;font-size:0.8rem;color:#0f172a;box-shadow:0 4px 16px rgba(15,45,94,0.15);white-space:nowrap;}
+.leaflet-tooltip-cored::before{display:none;}
 
-    /* ── BUENAS PRÁCTICAS ── */
-    .bp-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:2.5rem;max-width:740px;box-shadow:0 4px 20px rgba(15,45,94,0.07);}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
-    .form-group{display:flex;flex-direction:column;gap:0.4rem;}
-    .form-label{font-size:0.73rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--navy);font-weight:700;}
-    .form-input,.form-textarea,.form-select{
-      background:var(--bg);border:2px solid var(--border);border-radius:8px;
-      color:var(--text);font-family:'Sora',sans-serif;font-size:0.88rem;
-      padding:0.65rem 0.9rem;outline:none;transition:border-color 0.2s;width:100%;
-    }
-    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--navy);}
-    .form-textarea{resize:vertical;min-height:110px;}
-    .submit-btn{
-      background:var(--navy);color:#ffffff;font-weight:700;font-size:0.82rem;
-      letter-spacing:0.06em;text-transform:uppercase;padding:0.85rem 2.2rem;
-      border-radius:8px;border:none;cursor:pointer;
-      transition:background 0.2s,transform 0.15s,box-shadow 0.15s;margin-top:0.75rem;
-    }
-    .submit-btn:hover{background:var(--navy2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,45,94,0.25);}
-    .submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
-    .bp-note{font-size:0.78rem;color:var(--muted);margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);line-height:1.65;}
-    .bp-success{display:none;background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.3);border-radius:10px;padding:1.75rem;text-align:center;margin-top:1.5rem;}
-    .bp-success-icon{font-size:2.5rem;margin-bottom:0.5rem;}
-    .bp-success-title{font-weight:700;font-size:1rem;color:#15803d;margin-bottom:0.4rem;}
-    .bp-success-text{font-size:0.85rem;color:var(--muted);}
+/* Buscador / Reporte municipio */
+.report-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-top:2.5rem;}
+.report-search-row{display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;}
+.report-suggestions{position:relative;flex:1;min-width:220px;}
+.report-suggestions input{width:100%;background:var(--bg);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:0.92rem;padding:0.7rem 1rem;outline:none;transition:border-color 0.2s;}
+.report-suggestions input:focus{border-color:var(--navy);}
+.suggestion-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;margin-top:4px;box-shadow:0 8px 24px rgba(15,45,94,0.15);max-height:240px;overflow-y:auto;z-index:20;display:none;}
+.suggestion-item{padding:0.6rem 1rem;font-size:0.85rem;cursor:pointer;border-bottom:1px solid var(--border);}
+.suggestion-item:last-child{border-bottom:none;}
+.suggestion-item:hover{background:var(--bg2);}
+.suggestion-item .s-muni{font-weight:700;color:var(--navy);}
+.suggestion-item .s-dept{font-size:0.74rem;color:var(--muted2);}
+.resultado-municipio{display:none;margin-top:2rem;border-top:2px solid var(--border);padding-top:2rem;}
+.rm-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.rm-title{font-size:1.3rem;font-weight:800;color:var(--navy);}
+.rm-sub{font-size:0.85rem;color:var(--muted);margin-top:0.2rem;}
+.rm-stats{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.75rem;}
+.rm-stat{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1.4rem;text-align:center;flex:1;min-width:130px;}
+.rm-stat-val{font-size:1.6rem;font-weight:800;color:var(--navy);}
+.rm-stat-lbl{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted2);margin-top:0.2rem;}
+.rm-cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.rm-col-title{font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.5rem;}
+.rm-col-fort .rm-col-title{color:#15803d;}
+.rm-col-sug .rm-col-title{color:#b45309;}
+.rm-tema{font-size:0.85rem;padding:0.55rem 0.8rem;border-radius:8px;margin-bottom:0.5rem;display:flex;align-items:flex-start;gap:0.5rem;line-height:1.4;}
+.rm-col-fort .rm-tema{background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.2);color:#14532d;}
+.rm-col-sug .rm-tema{background:rgba(217,119,6,0.07);border:1px solid rgba(217,119,6,0.2);color:#78350f;}
+.rm-empty{font-size:0.82rem;color:var(--muted2);padding:0.5rem 0;}
 
-    /* ── FOOTER ── */
-    footer{background:var(--navy);color:rgba(255,255,255,0.6);border-top:3px solid var(--accent2);padding:2rem 1.5rem;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;}
-    footer a{color:rgba(255,255,255,0.5);text-decoration:none;}
-    footer a:hover{color:white;}
+/* Fortalecimiento */
+.ftl-rank-grid{display:grid;gap:0.6rem;margin-top:2rem;}
+.ftl-rank-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.5rem;display:flex;align-items:center;gap:1.25rem;transition:border-color 0.2s,transform 0.15s,box-shadow 0.2s;}
+.ftl-rank-card:hover{border-color:var(--accent2);transform:translateX(4px);box-shadow:0 4px 16px rgba(29,78,216,0.08);}
+.ftl-rank-pos{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:1.2rem;color:var(--navy);min-width:36px;}
+.ftl-rank-info{flex:1;min-width:0;}
+.ftl-rank-name{font-weight:700;font-size:0.9rem;color:var(--navy);}
+.ftl-rank-dept{font-size:0.73rem;color:var(--muted2);margin-top:0.15rem;}
+.ftl-bar-wrap{flex:0 0 160px;}
+.ftl-bar{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:0.25rem;}
+.ftl-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--navy),var(--accent2));}
+.ftl-bar-pts{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--accent);}
+.ftl-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem;}
+.ftl-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.75rem;position:relative;overflow:hidden;}
+.ftl-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--navy),var(--accent2));}
+.ftl-num{font-family:'IBM Plex Mono',monospace;font-size:3.5rem;font-weight:800;position:absolute;top:0.75rem;right:1.25rem;color:rgba(15,45,94,0.05);line-height:1;pointer-events:none;}
+.ftl-title{font-size:1rem;font-weight:700;margin-bottom:0.65rem;color:var(--navy);}
+.ftl-text{font-size:0.84rem;color:var(--muted);line-height:1.7;}
+.ftl-list{list-style:none;padding:0;margin:0.75rem 0 0;}
+.ftl-list li{font-size:0.83rem;color:var(--muted);padding:0.3rem 0;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;align-items:flex-start;}
+.ftl-list li:last-child{border-bottom:none;}
+.ftl-list li::before{content:'▸';color:var(--accent);flex-shrink:0;margin-top:0.05rem;}
 
-    /* ── LEAFLET POPUP OVERRIDE ── */
-    .leaflet-popup-content-wrapper{background:#fff;border-radius:10px;border:1px solid var(--border);box-shadow:0 8px 24px rgba(15,45,94,0.15);padding:0;}
-    .leaflet-popup-content{margin:0;padding:0;}
-    .leaflet-popup-tip{background:#fff;}
-    .popup-inner{padding:1rem 1.1rem;min-width:200px;}
-    .popup-name{font-weight:700;color:var(--navy);font-size:0.92rem;margin-bottom:0.2rem;}
-    .popup-loc{font-size:0.75rem;color:var(--muted2);margin-bottom:0.6rem;}
-    .popup-row{display:flex;justify-content:space-between;font-size:0.78rem;padding:0.2rem 0;border-top:1px solid var(--border);}
-    .popup-key{color:var(--muted);}
-    .popup-val{font-weight:700;color:var(--navy);}
+/* Multimedia */
+.media-tabs{display:flex;gap:0.25rem;border-bottom:2px solid var(--border);margin-bottom:2.5rem;}
+.media-tab{font-size:0.8rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:0.6rem 1.4rem;background:transparent;border:none;border-bottom:3px solid transparent;color:var(--muted);cursor:pointer;transition:all 0.2s;margin-bottom:-2px;font-family:'Sora',sans-serif;}
+.media-tab.active{color:var(--navy);border-bottom-color:var(--navy);}
+.media-tab:hover{color:var(--navy);}
+.media-panel{display:none;}
+.media-panel.active{display:block;}
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;}
+.img-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;}
+.img-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(15,45,94,0.1);}
+.img-card img{width:100%;height:200px;object-fit:cover;display:block;}
+.img-card-body{padding:0.9rem 1.1rem;}
+.img-card-title{font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:0.25rem;}
+.img-card-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.video-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;}
+.video-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(15,45,94,0.1);}
+.video-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;}
+.video-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.video-card-body{padding:0.9rem 1.1rem;}
+.video-card-title{font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:0.25rem;}
+.video-card-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+.doc-list{display:flex;flex-direction:column;gap:0.75rem;}
+.doc-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.5rem;display:flex;align-items:center;gap:1.25rem;text-decoration:none;color:inherit;transition:border-color 0.2s,transform 0.15s,box-shadow 0.2s;}
+.doc-card:hover{border-color:var(--accent2);transform:translateX(4px);box-shadow:0 4px 16px rgba(29,78,216,0.08);}
+.doc-icon{font-size:2rem;flex-shrink:0;}
+.doc-info{flex:1;min-width:0;}
+.doc-title{font-size:0.92rem;font-weight:700;color:var(--navy);margin-bottom:0.2rem;}
+.doc-meta{font-size:0.75rem;color:var(--muted);}
+.doc-badge{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:0.2rem 0.6rem;border-radius:5px;background:rgba(29,78,216,0.1);color:var(--accent);border:1px solid rgba(29,78,216,0.2);flex-shrink:0;}
 
-    /* ── MULTIMEDIA ── */
-    .media-tabs{display:flex;gap:0.25rem;border-bottom:2px solid var(--border);margin-bottom:2.5rem;}
-    .media-tab{
-      font-size:0.8rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
-      padding:0.6rem 1.4rem;background:transparent;border:none;border-bottom:3px solid transparent;
-      color:var(--muted);cursor:pointer;transition:all 0.2s;margin-bottom:-2px;
-    }
-    .media-tab.active{color:var(--navy);border-bottom-color:var(--navy);}
-    .media-tab:hover{color:var(--navy);}
-    .media-panel{display:none;}
-    .media-panel.active{display:block;}
+/* Buenas prácticas */
+.bp-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:2.5rem;max-width:740px;box-shadow:0 4px 20px rgba(15,45,94,0.07);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.form-group{display:flex;flex-direction:column;gap:0.4rem;}
+.form-label{font-size:0.73rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--navy);font-weight:700;}
+.form-input,.form-textarea,.form-select{background:var(--bg);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:0.88rem;padding:0.65rem 0.9rem;outline:none;transition:border-color 0.2s;width:100%;}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--navy);}
+.form-textarea{resize:vertical;min-height:110px;}
+.bp-note{font-size:0.78rem;color:var(--muted);margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);line-height:1.65;}
+.bp-success{display:none;background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.3);border-radius:10px;padding:1.75rem;text-align:center;margin-top:1.5rem;}
+.bp-success-icon{font-size:2.5rem;margin-bottom:0.5rem;}
+.bp-success-title{font-weight:700;font-size:1rem;color:#15803d;margin-bottom:0.4rem;}
+.bp-success-text{font-size:0.85rem;color:var(--muted);}
+.bp-pub-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;display:flex;gap:1.1rem;align-items:flex-start;transition:border-color 0.2s,box-shadow 0.2s;}
+.bp-pub-card:hover{border-color:var(--accent2);box-shadow:0 4px 16px rgba(29,78,216,0.08);}
+.bp-pub-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.95rem;color:#fff;flex-shrink:0;}
+.bp-pub-meta{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.4rem;}
+.bp-pub-name{font-weight:700;font-size:0.88rem;color:var(--navy);}
+.bp-pub-inst{font-size:0.75rem;color:var(--muted);}
+.bp-pub-date{font-size:0.72rem;color:var(--muted2);margin-left:auto;}
+.bp-pub-title{font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:0.4rem;}
+.bp-pub-body{font-size:0.85rem;color:var(--muted);line-height:1.7;}
+.bp-pub-list{display:flex;flex-direction:column;gap:1rem;margin-top:2rem;}
 
-    /* Imágenes */
-    .img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;}
-    .img-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;}
-    .img-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(15,45,94,0.1);}
-    .img-card img{width:100%;height:200px;object-fit:cover;display:block;}
-    .img-card-body{padding:0.9rem 1.1rem;}
-    .img-card-title{font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:0.25rem;}
-    .img-card-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+footer{background:var(--navy);color:rgba(255,255,255,0.6);border-top:3px solid var(--accent2);padding:2rem 1.5rem;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;margin-top:auto;}
+footer a{color:rgba(255,255,255,0.5);text-decoration:none;}
+footer a:hover{color:#fff;}
 
-    /* Videos YouTube */
-    .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
-    .video-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;}
-    .video-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(15,45,94,0.1);}
-    .video-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;}
-    .video-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
-    .video-card-body{padding:0.9rem 1.1rem;}
-    .video-card-title{font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:0.25rem;}
-    .video-card-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
-
-    /* Documentos */
-    .doc-list{display:flex;flex-direction:column;gap:0.75rem;}
-    .doc-card{
-      background:var(--surface);border:1px solid var(--border);border-radius:10px;
-      padding:1.1rem 1.5rem;display:flex;align-items:center;gap:1.25rem;
-      text-decoration:none;color:inherit;
-      transition:border-color 0.2s,transform 0.15s,box-shadow 0.2s;
-    }
-    .doc-card:hover{border-color:var(--accent2);transform:translateX(4px);box-shadow:0 4px 16px rgba(29,78,216,0.08);}
-    .doc-icon{font-size:2rem;flex-shrink:0;}
-    .doc-info{flex:1;min-width:0;}
-    .doc-title{font-size:0.92rem;font-weight:700;color:var(--navy);margin-bottom:0.2rem;}
-    .doc-meta{font-size:0.75rem;color:var(--muted);}
-    .doc-badge{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:0.2rem 0.6rem;border-radius:5px;background:rgba(29,78,216,0.1);color:var(--accent);border:1px solid rgba(29,78,216,0.2);flex-shrink:0;}
-    .media-empty{text-align:center;padding:3.5rem 1rem;color:var(--muted);}
-    .media-empty-icon{font-size:3rem;margin-bottom:0.75rem;}
-    .media-empty-text{font-size:0.9rem;line-height:1.6;}
-    .media-empty code{font-family:'IBM Plex Mono',monospace;font-size:0.82em;background:var(--bg2);padding:0.1rem 0.4rem;border-radius:4px;color:var(--navy);}
-
-    /* ── BUENAS PRÁCTICAS PUBLICADAS ── */
-    .bp-pub-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;display:flex;gap:1.1rem;align-items:flex-start;transition:border-color 0.2s,box-shadow 0.2s;}
-    .bp-pub-card:hover{border-color:var(--accent2);box-shadow:0 4px 16px rgba(29,78,216,0.08);}
-    .bp-pub-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.95rem;color:#fff;flex-shrink:0;}
-    .bp-pub-meta{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.4rem;}
-    .bp-pub-name{font-weight:700;font-size:0.88rem;color:var(--navy);}
-    .bp-pub-inst{font-size:0.75rem;color:var(--muted);}
-    .bp-pub-date{font-size:0.72rem;color:var(--muted2);margin-left:auto;}
-    .bp-pub-title{font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:0.4rem;}
-    .bp-pub-body{font-size:0.85rem;color:var(--muted);line-height:1.7;}
-    .bp-pub-list{display:flex;flex-direction:column;gap:1rem;margin-top:2rem;}
-
-    @media(max-width:700px){
-      .ftl-grid,.form-row{grid-template-columns:1fr;}
-      .nav-links{display:none;}
-      .ftl-bar-wrap{display:none;}
-      #navbar{padding:0 1rem;}
-      .bp-pub-date{margin-left:0;}
-    }
-  </style>
+@media(max-width:700px){
+  .nav-links{display:none;}
+  #navbar{padding:0 1rem;}
+  .ftl-grid,.form-row,.rm-cols{grid-template-columns:1fr;}
+  .ftl-bar-wrap{display:none;}
+  .bp-pub-date{margin-left:0;}
+}
+</style>
 </head>
 <body>
 
-<!-- ═══ NAVBAR ═══ -->
 <nav id="navbar">
-  <div class="logo-wrap">
+  <button class="logo-wrap" onclick="irA('inicio')">
     <div class="logo-shield">🛡</div>
-    <div>
-      <div class="logo-text">COORDINADORAS</div>
-      <div class="logo-sub">Coordinadoras para la Reducción de Desastres</div>
-    </div>
-  </div>
+    <div><div class="logo-text">Sistema de Coordinadoras</div><div class="logo-sub">Reducción de Desastres</div></div>
+  </button>
   <ul class="nav-links">
-    <li><a href="#inicio"           class="active">Inicio</a></li>
-    <li><a href="#mapa-section">Mapa</a></li>
-    <li><a href="#fortalecimiento">Fortalecimiento</a></li>
-    <li><a href="#multimedia">Multimedia</a></li>
-    <li><a href="#buenas-practicas">Buenas Prácticas</a></li>
+    <li><button class="nav-btn active" data-vista="inicio" onclick="irA('inicio')">Inicio</button></li>
+    <li><button class="nav-btn" data-vista="mapa" onclick="irA('mapa')">Mapa</button></li>
+    <li><button class="nav-btn" data-vista="fortalecimiento" onclick="irA('fortalecimiento')">Fortalecimiento</button></li>
+    <li><button class="nav-btn" data-vista="multimedia" onclick="irA('multimedia')">Multimedia</button></li>
+    <li><button class="nav-btn" data-vista="buenas-practicas" onclick="irA('buenas-practicas')">Buenas Prácticas</button></li>
   </ul>
 </nav>
 
-<!-- ═══ HERO ═══ -->
-<section id="inicio">
-  <div class="hero-dots"></div>
-  <div class="hero-glow"></div>
-  <div class="alert-badge">
-    <span class="alert-dot"></span>Sistema de coordinadoras
-  </div>
-  <h1 class="hero-title">SISTEMA DE<br><span>COORDINADORAS</span></h1>
-  <p class="hero-sub">Plataforma de información para la prevención, mitigación y respuesta ante desastres naturales y antrópicos.</p>
-  <div class="hero-cta">
-    <a href="#mapa-section" class="btn-primary">Ver Mapa Interactivo</a>
-    <a href="#buenas-practicas" class="btn-secondary">Enviar Buena Práctica</a>
-  </div>
-  <div class="stats-bar">
-    <div class="stat-item">
-      <div class="stat-value" id="stat-coord">—</div>
-      <div class="stat-label">Municipios</div>
+<main>
+
+  <!-- ═══════════ VISTA: INICIO ═══════════ -->
+  <section class="vista active" id="vista-inicio">
+    <div id="inicio-hero">
+      <div class="hero-glow"></div>
+      <div class="alert-badge"><span class="alert-dot"></span>Sistema activo — Nivel de alerta: Amarillo</div>
+      <h1 class="hero-title">Reducción de Riesgos<br><span>Coordinada y Eficaz</span></h1>
+      <p class="hero-sub">Plataforma nacional de coordinación interinstitucional para la prevención, mitigación y respuesta ante desastres naturales y antrópicos.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="irA('mapa')">Ver Mapa Interactivo</button>
+        <button class="btn-secondary" onclick="irA('buenas-practicas')">Enviar Buena Práctica</button>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-item"><div class="stat-value" id="stat-coord">—</div><div class="stat-label">Coordinadoras</div></div>
+        <div class="stat-item"><div class="stat-value" id="stat-depts">—</div><div class="stat-label">Departamentos</div></div>
+      </div>
     </div>
-    <div class="stat-item">
-      <div class="stat-value" id="stat-depts">—</div>
-      <div class="stat-label">Departamentos</div>
+
+    <div class="section">
+      <p class="section-tag">// Contenido General</p>
+      <h2 class="section-title">Sistema de <span>Coordinadoras</span></h2>
+      <p class="section-desc">Red jerarquizada de instituciones públicas, privadas y comunitarias orientadas a la gestión integral del riesgo de desastres en el territorio nacional.</p>
+      <div class="cards-grid">
+        <div class="card"><div class="card-line"></div><div class="card-icon">🏛️</div><div class="card-title">Marco Legal</div><div class="card-text">Decreto 109-96 y sus reformas establecen la estructura del sistema nacional con coordinadoras en cuatro niveles territoriales.</div></div>
+        <div class="card"><div class="card-line"></div><div class="card-icon">🌐</div><div class="card-title">Estructura Territorial</div><div class="card-text">Coordinadoras nacionales, regionales, departamentales, municipales y locales conforman una red integrada de respuesta y prevención.</div></div>
+        <div class="card"><div class="card-line"></div><div class="card-icon">📡</div><div class="card-title">Sistema de Alerta</div><div class="card-text">Monitoreo continuo de amenazas volcánicas, sísmicas, hidrometeorológicas y tecnológicas con protocolos de alerta a cada nivel.</div></div>
+        <div class="card"><div class="card-line"></div><div class="card-icon">🤝</div><div class="card-title">Interinstitucionalidad</div><div class="card-text">Articulación de instituciones del Estado, ONGs, empresa privada y comunidades en torno a la gestión del riesgo de desastres.</div></div>
+        <div class="card"><div class="card-line"></div><div class="card-icon">🎓</div><div class="card-title">Formación Continua</div><div class="card-text">Programas de capacitación técnica, simulacros nacionales y formación de brigadistas comunitarios en todo el territorio.</div></div>
+        <div class="card"><div class="card-line"></div><div class="card-icon">📊</div><div class="card-title">Evaluación y Mejora</div><div class="card-text">Sistema de indicadores de desempeño para medir la efectividad de las coordinadoras y guiar planes de fortalecimiento.</div></div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ═══ CONTENIDO GENERAL ═══ -->
-<hr class="divider"/>
-<section class="section" id="contenido-general">
-  <p class="section-tag">// Contenido General</p>
-  <h2 class="section-title">Sistema de <span>Coordinadoras</span></h2>
-  <p class="section-desc">Red jerarquizada de instituciones públicas, privadas y comunitarias orientadas a la gestión integral del riesgo de desastres en el territorio nacional.</p>
-  <div class="cards-grid">
-    <div class="card"><div class="card-line"></div><div class="card-icon">🏛️</div><div class="card-title">Marco Legal</div><div class="card-text">Decreto 109-96 y sus reformas establecen la estructura del Sistema Nacional de Reducción de Desastres con coordinadoras en cuatro niveles territoriales.</div></div>
-    <div class="card"><div class="card-line"></div><div class="card-icon">🌐</div><div class="card-title">Estructura Territorial</div><div class="card-text">Coordinadoras nacionales, regionales, departamentales, municipales y locales conforman una red integrada de respuesta y prevención.</div></div>
-    <div class="card"><div class="card-line"></div><div class="card-icon">📡</div><div class="card-title">Sistema de Alerta</div><div class="card-text">Monitoreo continuo de amenazas volcánicas, sísmicas, hidrometeorológicas y tecnológicas con protocolos de alerta a cada nivel.</div></div>
-    <div class="card"><div class="card-line"></div><div class="card-icon">🤝</div><div class="card-title">Interinstitucionalidad</div><div class="card-text">Articulación de instituciones del Estado, ONGs, empresa privada y comunidades en torno a la gestión del riesgo de desastres.</div></div>
-    <div class="card"><div class="card-line"></div><div class="card-icon">🎓</div><div class="card-title">Formación Continua</div><div class="card-text">Programas de capacitación técnica, simulacros nacionales y formación de brigadistas comunitarios en todo el territorio.</div></div>
-    <div class="card"><div class="card-line"></div><div class="card-icon">📊</div><div class="card-title">Evaluación y Mejora</div><div class="card-text">Sistema de indicadores de desempeño para medir la efectividad de las coordinadoras y guiar planes de fortalecimiento.</div></div>
-  </div>
-</section>
+  <!-- ═══════════ VISTA: MAPA ═══════════ -->
+  <section class="vista" id="vista-mapa">
+    <div class="page-hero">
+      <div class="page-hero-dots"></div>
+      <p class="page-tag">// Dashboard — Mapa Interactivo</p>
+      <h1 class="page-title">Cobertura <span>Municipal</span></h1>
+      <p class="page-desc">Explora el mapa o busca tu municipio para generar un reporte en PDF con los temas fortalecidos y las sugerencias de mejora.</p>
+    </div>
 
-<!-- ═══ MAPA ═══ -->
-<hr class="divider"/>
-<section class="section" id="mapa-section">
-  <p class="section-tag">// Dashboard — Mapa Interactivo</p>
-  <h2 class="section-title">Cobertura <span>Municipal</span></h2>
-  <p class="section-desc">Pasa el cursor sobre cualquier punto para ver el detalle. Datos cargados desde <code style="font-family:'IBM Plex Mono',monospace;font-size:0.85em;color:var(--accent)">datos.js</code>.</p>
+    <div class="section">
+      <div class="map-controls">
+        <button class="map-filter-btn active" onclick="filtrarMapa('todos',this)">Todos</button>
+        <button class="map-filter-btn f-alto" onclick="filtrarMapa('Alto',this)">🟢 Alto</button>
+        <button class="map-filter-btn f-medio" onclick="filtrarMapa('Medio',this)">🟡 Medio</button>
+        <button class="map-filter-btn f-bajo" onclick="filtrarMapa('Bajo',this)">🔴 Requiere apoyo</button>
+        <input class="map-search" id="map-search" type="text" placeholder="🔍  Buscar municipio o departamento…" oninput="buscarEnMapa(this.value)"/>
+        <span class="map-counter" id="map-counter"></span>
+      </div>
+      <div id="mapa"></div>
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--alto)"></div>Alto desempeño</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--medio)"></div>Desempeño medio</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--bajo)"></div>Requiere fortalecimiento</div>
+      </div>
 
-  <div class="map-controls" style="margin-top:2rem;">
-    <button class="map-filter-btn active"    onclick="filtrarMapa('todos',this)">Todos</button>
-    <button class="map-filter-btn f-alto"    onclick="filtrarMapa('Alto',this)">🟢 Alto</button>
-    <button class="map-filter-btn f-medio"   onclick="filtrarMapa('Medio',this)">🟡 Medio</button>
-    <button class="map-filter-btn f-bajo"    onclick="filtrarMapa('Bajo',this)">🔴 Requiere apoyo</button>
-    <input class="map-search" id="map-search" type="text" placeholder="🔍  Buscar municipio o departamento…" oninput="buscarEnMapa(this.value)"/>
-    <span class="map-counter" id="map-counter"></span>
-  </div>
+      <div class="report-box">
+        <h3 style="font-size:1.05rem;font-weight:800;color:var(--navy);margin:0 0 0.4rem;">📄 Reporte por Municipio</h3>
+        <p style="font-size:0.85rem;color:var(--muted);margin:0 0 1.25rem;">Busca un municipio para ver sus temas fortalecidos y sugerencias, y descargar el reporte en PDF.</p>
+        <div class="report-search-row">
+          <div class="report-suggestions">
+            <input type="text" id="rm-search" placeholder="Escribe el nombre de tu municipio…" autocomplete="off" oninput="buscarSugerencias(this.value)"/>
+            <div class="suggestion-list" id="rm-suggestions"></div>
+          </div>
+        </div>
 
-  <div id="mapa"></div>
+        <div class="resultado-municipio" id="resultado-municipio">
+          <div class="rm-header">
+            <div><div class="rm-title" id="rm-title">—</div><div class="rm-sub" id="rm-sub">—</div></div>
+            <button class="btn-navy" onclick="generarPDF()">⬇ Descargar Reporte PDF</button>
+          </div>
+          <div class="rm-stats">
+            <div class="rm-stat"><div class="rm-stat-val" id="rm-nivel">—</div><div class="rm-stat-lbl">Nivel actual</div></div>
+            <div class="rm-stat"><div class="rm-stat-val" id="rm-fcount">—</div><div class="rm-stat-lbl">Temas fortalecidos</div></div>
+            <div class="rm-stat"><div class="rm-stat-val" id="rm-scount">—</div><div class="rm-stat-lbl">Temas sugeridos</div></div>
+            <div class="rm-stat"><div class="rm-stat-val" id="rm-puntaje">—</div><div class="rm-stat-lbl">Puntaje</div></div>
+          </div>
+          <div class="rm-cols">
+            <div class="rm-col-fort"><div class="rm-col-title">✅ Temas Fortalecidos</div><div id="rm-fortalecidos"></div></div>
+            <div class="rm-col-sug"><div class="rm-col-title">📌 Sugerencias de Mejora</div><div id="rm-sugeridos"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="map-legend">
-    <div class="legend-item"><div class="legend-dot" style="background:var(--alto)"></div>Alto desempeño</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--medio)"></div>Desempeño medio</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--bajo)"></div>Requiere fortalecimiento</div>
-  </div>
-</section>
+  <!-- ═══════════ VISTA: FORTALECIMIENTO ═══════════ -->
+  <section class="vista" id="vista-fortalecimiento">
+    <div class="page-hero">
+      <div class="page-hero-dots"></div>
+      <p class="page-tag">// Fortalecimiento Institucional</p>
+      <h1 class="page-title">Coordinadoras con más <span>Temas a Favor</span></h1>
+      <p class="page-desc">Ranking generado automáticamente desde la matriz de datos. Las coordinadoras con mayor número de temas activos aparecen primero.</p>
+    </div>
+    <div class="section">
+      <div class="ftl-rank-grid" id="ftl-ranking"></div>
+      <h3 style="font-size:1.15rem;font-weight:800;color:var(--navy);margin:4rem 0 0.5rem;">Ejes Estratégicos</h3>
+      <p style="color:var(--muted);font-size:0.85rem;margin:0 0 0;">Marco de referencia para el desarrollo institucional de las coordinadoras.</p>
+      <div class="ftl-grid">
+        <div class="ftl-card"><div class="ftl-num">01</div><div class="ftl-title">🏗️ Capacidad Operativa</div><div class="ftl-text">Dotación de equipos, vehículos y centros de operaciones de emergencia funcionales.</div><ul class="ftl-list"><li>Actualización de inventarios de recursos</li><li>Protocolos de activación de COE</li><li>Redes de comunicación redundantes</li><li>Equipo de protección personal (EPP)</li></ul></div>
+        <div class="ftl-card"><div class="ftl-num">02</div><div class="ftl-title">📚 Formación y Capacitación</div><div class="ftl-text">Programas de formación técnica continua para integrantes de coordinadoras.</div><ul class="ftl-list"><li>Cursos de gestión del riesgo</li><li>Primeros auxilios y rescate</li><li>Análisis de vulnerabilidad territorial</li><li>Sistemas de información geográfica (SIG)</li></ul></div>
+        <div class="ftl-card"><div class="ftl-num">03</div><div class="ftl-title">📋 Planificación Estratégica</div><div class="ftl-text">Elaboración y actualización periódica de planes de respuesta y contingencia.</div><ul class="ftl-list"><li>Plan Municipal de Respuesta (PMR)</li><li>Mapas de riesgo actualizados</li><li>Planes de evacuación comunitaria</li><li>Protocolos de alerta temprana</li></ul></div>
+        <div class="ftl-card"><div class="ftl-num">04</div><div class="ftl-title">🔗 Articulación Interinstitucional</div><div class="ftl-text">Fortalecimiento de lazos entre instituciones para una respuesta coordinada.</div><ul class="ftl-list"><li>Mesas técnicas intersectoriales</li><li>Acuerdos de cooperación</li><li>Ejercicios conjuntos de simulacro</li><li>Rendición de cuentas ante la coordinadora departamental</li></ul></div>
+      </div>
+    </div>
+  </section>
 
-<!-- ═══ FORTALECIMIENTO ═══ -->
-<hr class="divider"/>
-<section class="section" id="fortalecimiento">
-  <p class="section-tag">// Fortalecimiento Institucional</p>
-  <h2 class="section-title">Coordinadoras con más <span>Temas a Favor</span></h2>
-  <p class="section-desc">Generado automáticamente desde la matriz. Las coordinadoras con mayor número de temas de fortalecimiento activos aparecen primero.</p>
-  <div class="ftl-rank-grid" id="ftl-ranking"></div>
+  <!-- ═══════════ VISTA: MULTIMEDIA ═══════════ -->
+  <section class="vista" id="vista-multimedia">
+    <div class="page-hero">
+      <div class="page-hero-dots"></div>
+      <p class="page-tag">// Recursos Multimedia</p>
+      <h1 class="page-title">Galería de <span>Recursos</span></h1>
+      <p class="page-desc">Imágenes, videos y documentos del sistema de coordinadoras.</p>
+    </div>
+    <div class="section">
+      <div class="media-tabs">
+        <button class="media-tab active" onclick="mediaTab('imagenes',this)">🖼️ Imágenes</button>
+        <button class="media-tab" onclick="mediaTab('videos',this)">▶️ Videos</button>
+        <button class="media-tab" onclick="mediaTab('documentos',this)">📄 Documentos</button>
+      </div>
 
-  <h3 style="font-size:1.15rem;font-weight:800;color:var(--navy);margin:4rem 0 0.5rem;">Ejes Estratégicos</h3>
-  <p style="color:var(--muted);font-size:0.85rem;margin:0 0 1.5rem;">Marco de referencia para el desarrollo institucional de las coordinadoras.</p>
-  <div class="ftl-grid">
-    <div class="ftl-card"><div class="ftl-num">01</div><div class="ftl-title">🏗️ Capacidad Operativa</div><div class="ftl-text">Dotación de equipos, vehículos y centros de operaciones de emergencia funcionales.</div><ul class="ftl-list"><li>Actualización de inventarios de recursos</li><li>Protocolos de activación de COE</li><li>Redes de comunicación redundantes</li><li>Equipo de protección personal (EPP)</li></ul></div>
-    <div class="ftl-card"><div class="ftl-num">02</div><div class="ftl-title">📚 Formación y Capacitación</div><div class="ftl-text">Programas de formación técnica continua para integrantes de coordinadoras.</div><ul class="ftl-list"><li>Cursos de gestión del riesgo</li><li>Primeros auxilios y rescate</li><li>Análisis de vulnerabilidad territorial</li><li>Sistemas de información geográfica (SIG)</li></ul></div>
-    <div class="ftl-card"><div class="ftl-num">03</div><div class="ftl-title">📋 Planificación Estratégica</div><div class="ftl-text">Elaboración y actualización periódica de planes de respuesta y contingencia.</div><ul class="ftl-list"><li>Plan Municipal de Respuesta (PMR)</li><li>Mapas de riesgo actualizados</li><li>Planes de evacuación comunitaria</li><li>Protocolos de alerta temprana</li></ul></div>
-    <div class="ftl-card"><div class="ftl-num">04</div><div class="ftl-title">🔗 Articulación Interinstitucional</div><div class="ftl-text">Fortalecimiento de lazos entre instituciones para una respuesta coordinada.</div><ul class="ftl-list"><li>Mesas técnicas intersectoriales</li><li>Acuerdos de cooperación</li><li>Ejercicios conjuntos de simulacro</li><li>Rendición de cuentas ante la CONRED</li></ul></div>
-  </div>
-</section>
-
-<!-- ═══ MULTIMEDIA ═══ -->
-<hr class="divider"/>
-<section class="section" id="multimedia">
-  <p class="section-tag">// Recursos Multimedia</p>
-  <h2 class="section-title">Galería de <span>Recursos</span></h2>
-  <p class="section-desc">Imágenes, videos y documentos del sistema de coordinadoras. <code style="font-family:'IBM Plex Mono',monospace;font-size:0.85em;color:var(--accent)">index.html</code> siguiendo las instrucciones en cada sección.</p>
-
-  <!-- TABS -->
-  <div class="media-tabs" style="margin-top:2.5rem;">
-    <button class="media-tab active" onclick="mediaTab('imagenes',this)">🖼️ Imágenes</button>
-    <button class="media-tab"        onclick="mediaTab('videos',this)">▶️ Videos</button>
-    <button class="media-tab"        onclick="mediaTab('documentos',this)">📄 Documentos</button>
-  </div>
-
-  <!-- ── PANEL: IMÁGENES ── -->
-  <div class="media-panel active" id="panel-imagenes">
-    <div class="img-grid">
-
-      <!--
-      ════════════════════════════════════════════════════════
-      CÓMO AGREGAR UNA IMAGEN:
-      1. Sube el archivo al repositorio de GitHub
-         (Add file → Upload files)
-      2. Copia el bloque de abajo, pégalo aquí y edita:
-         - src="nombre-del-archivo.jpg"   (nombre exacto del archivo subido)
-         - El título y descripción
-
-      EJEMPLO con imagen subida al repo:
-      <div class="img-card">
-        <img src="simulacro-zacapa.jpg" alt="Simulacro en Zacapa"/>
-        <div class="img-card-body">
-          <div class="img-card-title">Simulacro departamental Zacapa</div>
-          <div class="img-card-desc">Ejercicio de evacuación realizado en marzo 2024.</div>
+      <div class="media-panel active" id="panel-imagenes">
+        <div class="img-grid">
+          <!-- Para agregar: sube la imagen a GitHub y copia este bloque con src="tu-archivo.jpg" -->
+          <div class="img-card">
+            <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80" alt="Coordinación de emergencias"/>
+            <div class="img-card-body"><div class="img-card-title">Ejemplo — Coordinación de emergencias</div><div class="img-card-desc">Reemplaza esta imagen subiendo tus propias fotos al repositorio.</div></div>
+          </div>
+          <div class="img-card">
+            <img src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=600&q=80" alt="Simulacro comunitario"/>
+            <div class="img-card-body"><div class="img-card-title">Ejemplo — Simulacro comunitario</div><div class="img-card-desc">Agrega aquí tus propias fotografías de actividades.</div></div>
+          </div>
         </div>
       </div>
 
-      EJEMPLO con imagen de internet (URL directa):
-      <div class="img-card">
-        <img src="https://ejemplo.com/foto.jpg" alt="descripción"/>
-        <div class="img-card-body">
-          <div class="img-card-title">Título de la imagen</div>
-          <div class="img-card-desc">Descripción breve.</div>
-        </div>
-      </div>
-      ════════════════════════════════════════════════════════
-      -->
-
-      <!-- IMAGEN DE EJEMPLO — borra este bloque cuando agregues las tuyas -->
-      <div class="img-card">
-        <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80" alt="Coordinación de emergencias"/>
-        <div class="img-card-body">
-          <div class="img-card-title">Ejemplo — Coordinación de emergencias</div>
-          <div class="img-card-desc">Reemplaza esta imagen subiendo tus propias fotos al repositorio.</div>
-        </div>
-      </div>
-      <div class="img-card">
-        <img src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=600&q=80" alt="Simulacro comunitario"/>
-        <div class="img-card-body">
-          <div class="img-card-title">Ejemplo — Simulacro comunitario</div>
-          <div class="img-card-desc">Agrega aquí tus propias fotografías de actividades.</div>
+      <div class="media-panel" id="panel-videos">
+        <div class="video-grid">
+          <!-- Para agregar: copia el ID de YouTube (después de embed/) en el src del iframe -->
+          <div class="video-card">
+            <div class="video-embed"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen loading="lazy"></iframe></div>
+            <div class="video-card-body"><div class="video-card-title">Ejemplo — Reemplaza con tu video</div><div class="video-card-desc">Copia el ID de tu video de YouTube y pégalo en el src del iframe.</div></div>
+          </div>
         </div>
       </div>
 
-    </div>
-  </div>
-
-  <!-- ── PANEL: VIDEOS ── -->
-  <div class="media-panel" id="panel-videos">
-    <div class="video-grid">
-
-      <!--
-      ════════════════════════════════════════════════════════
-      CÓMO AGREGAR UN VIDEO DE YOUTUBE:
-      1. Abre el video en YouTube
-      2. Clic en "Compartir" → "Insertar"
-      3. Copia solo el ID del video (los 11 caracteres después de "embed/")
-         Ejemplo: https://www.youtube.com/embed/dQw4w9WgXcQ
-                                                 ↑ este es el ID
-      4. Copia el bloque de abajo y pega el ID donde dice ID_DEL_VIDEO
-
-      <div class="video-card">
-        <div class="video-embed">
-          <iframe src="https://www.youtube.com/embed/ID_DEL_VIDEO"
-            allowfullscreen loading="lazy"></iframe>
-        </div>
-        <div class="video-card-body">
-          <div class="video-card-title">Título del video</div>
-          <div class="video-card-desc">Descripción breve del contenido.</div>
+      <div class="media-panel" id="panel-documentos">
+        <div class="doc-list">
+          <!-- Para agregar: sube el PDF a GitHub y cambia href="#" por el nombre del archivo -->
+          <a class="doc-card" href="#" target="_blank">
+            <div class="doc-icon">📋</div>
+            <div class="doc-info"><div class="doc-title">Ejemplo — Plan Municipal de Respuesta</div><div class="doc-meta">Sube tu PDF y cambia href="#" por el nombre del archivo</div></div>
+            <div class="doc-badge">PDF</div>
+          </a>
+          <a class="doc-card" href="#" target="_blank">
+            <div class="doc-icon">📊</div>
+            <div class="doc-info"><div class="doc-title">Ejemplo — Informe de Actividades</div><div class="doc-meta">Sube tu documento y actualiza este bloque</div></div>
+            <div class="doc-badge">PDF</div>
+          </a>
         </div>
       </div>
-      ════════════════════════════════════════════════════════
-      -->
+    </div>
+  </section>
 
-      <!-- VIDEO DE EJEMPLO — reemplaza el ID con el tuyo -->
-      <div class="video-card">
-        <div class="video-embed">
-          <iframe src="https://www.youtube.com/embed/EMZ_qqiDd5s"
-            allowfullscreen loading="lazy"></iframe>
+  <!-- ═══════════ VISTA: BUENAS PRÁCTICAS ═══════════ -->
+  <section class="vista" id="vista-buenas-practicas">
+    <div class="page-hero">
+      <div class="page-hero-dots"></div>
+      <p class="page-tag">// Buenas Prácticas</p>
+      <h1 class="page-title">Envía tu <span>Buena Práctica</span></h1>
+      <p class="page-desc">Comparte tu experiencia. El equipo técnico revisará tu aporte y solo publicará las prácticas que cumplan los criterios de calidad.</p>
+    </div>
+    <div class="section">
+      <div class="bp-wrap">
+        <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin:0 0 1.5rem;">📨 Formulario de envío</h3>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" for="bp-nombre">Nombre completo</label><input class="form-input" id="bp-nombre" type="text" placeholder="Ej. Ana García"/></div>
+          <div class="form-group"><label class="form-label" for="bp-institucion">Institución / Coordinadora</label><input class="form-input" id="bp-institucion" type="text" placeholder="Ej. Coordinadora Zacapa"/></div>
         </div>
-        <div class="video-card-body">
-          <div class="video-card-title">SEMINARIO VIRTUAL</div>
-          <div class="video-card-desc">Identificación y reducción de vulnerabilidades en la gestión del riesgo.</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" for="bp-correo">Correo electrónico</label><input class="form-input" id="bp-correo" type="email" placeholder="correo@ejemplo.com"/></div>
+          <div class="form-group">
+            <label class="form-label" for="bp-categoria">Categoría</label>
+            <select class="form-select" id="bp-categoria">
+              <option value="">— Selecciona —</option>
+              <option>Prevención</option><option>Preparación</option><option>Respuesta</option>
+              <option>Recuperación</option><option>Comunicación</option><option>Capacitación</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label class="form-label" for="bp-titulo">Título de la buena práctica</label>
+          <input class="form-input" id="bp-titulo" type="text" placeholder="Ej. Sistema de alerta comunitaria con WhatsApp"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="bp-descripcion">Descripción detallada</label>
+          <textarea class="form-textarea" id="bp-descripcion" placeholder="Describe la práctica: contexto, cómo se implementó, resultados obtenidos y recomendaciones para replicarla…"></textarea>
+        </div>
+        <button class="btn-navy" id="bp-submit" onclick="enviarPractica()" style="margin-top:0.75rem;">Enviar para revisión ▸</button>
+        <div class="bp-note">⚠️ <strong>Nota:</strong> Tu aporte será revisado por el equipo técnico antes de ser publicado. Recibirás respuesta en un plazo de 5 días hábiles.</div>
+        <div class="bp-success" id="bp-success">
+          <div class="bp-success-icon">✅</div>
+          <div class="bp-success-title">¡Envío recibido correctamente!</div>
+          <div class="bp-success-text">Tu buena práctica fue registrada. El equipo técnico la revisará y te notificará por correo electrónico.</div>
         </div>
       </div>
 
-    </div>
-  </div>
-
-  <!-- ── PANEL: DOCUMENTOS ── -->
-  <div class="media-panel" id="panel-documentos">
-    <div class="doc-list">
-
-      <!--
-      ════════════════════════════════════════════════════════
-      CÓMO AGREGAR UN DOCUMENTO:
-      1. Sube el PDF al repositorio de GitHub (Add file → Upload files)
-      2. Copia el bloque de abajo y edita:
-         - href="nombre-del-archivo.pdf"   (nombre exacto del archivo)
-         - El ícono, título, descripción y tipo
-
-      ÍCONOS SUGERIDOS:
-        📄 PDF genérico    📊 Informe / Excel
-        📋 Plan / Manual   🗺️ Mapa
-        📰 Boletín         📌 Resolución
-
-      EJEMPLO:
-      <a class="doc-card" href="plan-respuesta-2024.pdf" target="_blank">
-        <div class="doc-icon">📋</div>
-        <div class="doc-info">
-          <div class="doc-title">Plan Municipal de Respuesta 2024</div>
-          <div class="doc-meta">PDF · 2.4 MB · Actualizado enero 2024</div>
-        </div>
-        <div class="doc-badge">PDF</div>
-      </a>
-      ════════════════════════════════════════════════════════
-      -->
-
-      <!-- DOCUMENTOS DE EJEMPLO — reemplaza con los tuyos -->
-      <a class="doc-card" href="#" target="_blank">
-        <div class="doc-icon">📋</div>
-        <div class="doc-info">
-          <div class="doc-title">Ejemplo — Plan Municipal de Respuesta</div>
-          <div class="doc-meta">Sube tu PDF al repositorio y cambia href="#" por el nombre del archivo</div>
-        </div>
-        <div class="doc-badge">PDF</div>
-      </a>
-      <a class="doc-card" href="#" target="_blank">
-        <div class="doc-icon">📊</div>
-        <div class="doc-info">
-          <div class="doc-title">Ejemplo — Informe de Actividades</div>
-          <div class="doc-meta">Sube tu documento y actualiza este bloque con el nombre real</div>
-        </div>
-        <div class="doc-badge">PDF</div>
-      </a>
-      <a class="doc-card" href="#" target="_blank">
-        <div class="doc-icon">🗺️</div>
-        <div class="doc-info">
-          <div class="doc-title">Ejemplo — Mapa de Riesgos</div>
-          <div class="doc-meta">Puedes enlazar también documentos externos con su URL completa</div>
-        </div>
-        <div class="doc-badge">PDF</div>
-      </a>
-
-    </div>
-  </div>
-</section>
-
-<!-- ═══ BUENAS PRÁCTICAS ═══ -->
-<hr class="divider"/>
-<section class="section" id="buenas-practicas">
-  <p class="section-tag">// Buenas Prácticas</p>
-  <h2 class="section-title">Envía tu <span>Buena Práctica</span></h2>
-  <p class="section-desc">Comparte tu experiencia. Se revisará tu aporte y solo publicará las prácticas que cumplan los criterios de calidad.</p>
-
-  <!-- FORMULARIO DE ENVÍO -->
-  <div class="bp-wrap" style="margin-top:2.5rem;">
-    <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin:0 0 1.5rem;">📨 Formulario de envío</h3>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label" for="bp-nombre">Nombre completo</label>
-        <input class="form-input" id="bp-nombre" type="text" placeholder="Ej. Ana García"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="bp-institucion">Institución / Coordinadora</label>
-        <input class="form-input" id="bp-institucion" type="text" placeholder="Ej. COMRED Zacapa"/>
+      <div style="margin-top:4rem;">
+        <h3 style="font-size:1.2rem;font-weight:800;color:var(--navy);margin:0 0 0.4rem;">✅ Prácticas Aprobadas</h3>
+        <p style="color:var(--muted);font-size:0.85rem;margin:0;">Aportes revisados y aprobados por el equipo técnico.</p>
+        <div class="bp-pub-list" id="bp-publicadas"></div>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label" for="bp-correo">Correo electrónico</label>
-        <input class="form-input" id="bp-correo" type="email" placeholder="correo@ejemplo.com"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="bp-categoria">Categoría</label>
-        <select class="form-select" id="bp-categoria">
-          <option value="">— Selecciona —</option>
-          <option>Prevención</option><option>Preparación</option><option>Respuesta</option>
-          <option>Recuperación</option><option>Comunicación</option><option>Capacitación</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group" style="margin-bottom:1rem;">
-      <label class="form-label" for="bp-titulo">Título de la buena práctica</label>
-      <input class="form-input" id="bp-titulo" type="text" placeholder="Ej. Sistema de alerta comunitaria con WhatsApp"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="bp-descripcion">Descripción detallada</label>
-      <textarea class="form-textarea" id="bp-descripcion" placeholder="Describe la práctica: contexto, cómo se implementó, resultados obtenidos y recomendaciones para replicarla…"></textarea>
-    </div>
-    <button class="submit-btn" id="bp-submit" onclick="enviarPractica()">Enviar para revisión ▸</button>
-    <div class="bp-note">
-      ⚠️ <strong>Nota:</strong> Tu aporte será revisado antes de ser publicado. Solo se publicarán prácticas que cumplan con los criterios de calidad. Recibirás respuesta en un plazo de 5 días hábiles.
-    </div>
-    <div class="bp-success" id="bp-success">
-      <div class="bp-success-icon">✅</div>
-      <div class="bp-success-title">¡Envío recibido correctamente!</div>
-      <div class="bp-success-text">Tu buena práctica fue registrada. El equipo técnico la revisará y te notificará por correo electrónico.</div>
-    </div>
-  </div>
+  </section>
 
-  <!-- MURO DE PRÁCTICAS APROBADAS -->
-  <div style="margin-top:4rem;">
-    <h3 style="font-size:1.2rem;font-weight:800;color:var(--navy);margin:0 0 0.4rem;">
-      ✅ Prácticas Aprobadas
-    </h3>
-    <p style="color:var(--muted);font-size:0.85rem;margin:0 0 0;">
-      Aportes revisados y aprobados por el equipo técnico de CORED.
-    </p>
-    <div class="bp-pub-list" id="bp-publicadas"></div>
-  </div>
-</section>
+</main>
 
-<!-- ═══ FOOTER ═══ -->
 <footer>
-  <p>CORED — Sistema Nacional de Coordinadoras para la Reducción de Desastres &nbsp;|&nbsp; Guatemala</p>
+  <p>Sistema de Coordinadoras para la Reducción de Desastres &nbsp;|&nbsp; Guatemala</p>
   <p style="margin-top:0.5rem;">Sitio informativo · Los datos provienen de la matriz oficial · <a href="consola-admin.html">Consola admin</a></p>
 </footer>
 
-<!-- ═══ SCRIPTS ═══ -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="datos.js"></script>
+<script src="comun.js"></script>
 <script>
-// ── NAV SCROLL ACTIVO ──
-const navIds=['inicio','mapa-section','fortalecimiento','multimedia','buenas-practicas'];
-window.addEventListener('scroll',()=>{
-  const y=window.scrollY+80;
-  navIds.forEach(id=>{
-    const el=document.getElementById(id);
-    const lk=document.querySelector(`.nav-links a[href="#${id}"]`);
-    if(!el||!lk)return;
-    if(y>=el.offsetTop&&y<el.offsetTop+el.offsetHeight){
-      document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
-      lk.classList.add('active');
-    }
-  });
+const DATA = window.CORED_DATA || [];
+const COL = {Alto:'#16a34a', Medio:'#d97706', Bajo:'#dc2626'};
+
+/* ════════════════════ NAVEGACIÓN ENTRE VISTAS ════════════════════ */
+function irA(vista){
+  document.querySelectorAll('.vista').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const target = document.getElementById('vista-'+vista);
+  if(target) target.classList.add('active');
+  const btn = document.querySelector(`.nav-btn[data-vista="${vista}"]`);
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+
+  // Inicializar mapa solo la primera vez que se entra a esa vista
+  if(vista === 'mapa') setTimeout(initMap, 50);
+
+  // Guardar la vista actual en el hash de la URL (opcional, permite compartir enlace)
+  history.replaceState(null, '', '#'+vista);
+}
+
+// Al cargar la página, si hay un hash en la URL, abrir esa vista
+window.addEventListener('DOMContentLoaded', ()=>{
+  const hash = window.location.hash.replace('#','');
+  const vistasValidas = ['inicio','mapa','fortalecimiento','multimedia','buenas-practicas'];
+  if(vistasValidas.includes(hash)) irA(hash);
 });
 
-// ── DATOS ──
-const DATA = window.CORED_DATA || [];
+/* ════════════════════ STATS INICIO ════════════════════ */
 document.getElementById('stat-coord').textContent = DATA.length || '—';
 document.getElementById('stat-depts').textContent = new Set(DATA.map(d=>d.departamento)).size || '—';
 
-// ── COLORES ──
-const COL = {Alto:'#16a34a', Medio:'#d97706', Bajo:'#dc2626'};
-
-// ── MAPA ──
-// Se inicializa después de que el DOM esté completamente listo
-let map, marcadores=[], filtroActivo='todos';
+/* ════════════════════ MAPA ════════════════════ */
+let map, marcadores=[], filtroActivo='todos', mapaInicializado=false;
 
 function initMap(){
-  if(map) return; // evitar doble init
+  if(mapaInicializado) { if(map) map.invalidateSize(true); return; }
   const el = document.getElementById('mapa');
   if(!el || el.offsetHeight === 0) return;
-
   map = L.map('mapa', {zoomControl:true, preferCanvas:true}).setView([15.1,-90.3], 7);
-
-  // Dos fuentes de tiles como respaldo
-  const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
     attribution:'© <a href="https://carto.com">CARTO</a> © <a href="https://openstreetmap.org">OSM</a>',
     maxZoom:18, subdomains:'abcd'
   }).addTo(map);
-
-  // Forzar redibujado de tiles después de cargar
-  setTimeout(()=>{ map.invalidateSize(true); renderMarcadores('todos',''); }, 300);
+  mapaInicializado = true;
+  setTimeout(()=>{ map.invalidateSize(true); renderMarcadores('todos',''); }, 250);
 }
 
 function mkIcon(color){
-  return L.divIcon({
-    html:`<div style="width:11px;height:11px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.25)"></div>`,
-    className:'',iconSize:[11,11]
-  });
+  return L.divIcon({html:`<div style="width:11px;height:11px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.25)"></div>`,className:'',iconSize:[11,11]});
 }
 
-function popupHTML(d){
+function popupHTML(d, idx){
   const color=COL[d.nivel]||'#64748b';
   return `<div class="popup-inner">
     <div class="popup-name">${d.coordinadora}</div>
@@ -725,32 +540,28 @@ function popupHTML(d){
     <div class="popup-row"><span class="popup-key">Nivel</span><span class="popup-val" style="color:${color}">${d.nivel}</span></div>
     <div class="popup-row"><span class="popup-key">Temas fortalecimiento</span><span class="popup-val">${d.temas_fortalecimiento}</span></div>
     <div class="popup-row"><span class="popup-key">Puntaje</span><span class="popup-val">${d.puntaje}</span></div>
+    <button class="popup-pdf-btn" onclick="seleccionarYGenerar(${idx})">⬇ Ver reporte PDF</button>
   </div>`;
 }
 
 function renderMarcadores(filtro, query){
+  if(!map) return;
   marcadores.forEach(m=>map.removeLayer(m));
   marcadores=[];
   const q=(query||'').toLowerCase().trim();
-  const visible=DATA.filter(d=>{
-    const nivelOk=filtro==='todos'||d.nivel===filtro;
-    const queryOk=!q||[d.municipio,d.departamento,d.coordinadora].some(s=>s.toLowerCase().includes(q));
-    return nivelOk&&queryOk;
-  });
-  visible.forEach(d=>{
+  DATA.forEach((d, idx)=>{
+    const nivelOk = filtro==='todos' || d.nivel===filtro;
+    const queryOk = !q || [d.municipio,d.departamento,d.coordinadora].some(s=>s.toLowerCase().includes(q));
+    if(!nivelOk || !queryOk) return;
     const color=COL[d.nivel]||'#64748b';
     const m=L.marker([d.lat,d.lng],{icon:mkIcon(color)});
-    // Tooltip al pasar el cursor (sin click necesario)
-    m.bindTooltip(`<strong>${d.coordinadora}</strong><br>${d.municipio}, ${d.departamento}<br>Temas: <strong>${d.temas_fortalecimiento}</strong>`,{
-      direction:'top',offset:[0,-6],opacity:0.97,
-      className:'leaflet-tooltip-cored'
-    });
-    m.bindPopup(popupHTML(d),{maxWidth:260});
+    m.bindTooltip(`<strong>${d.coordinadora}</strong><br>${d.municipio}, ${d.departamento}<br>Temas: <strong>${d.temas_fortalecimiento}</strong>`,{direction:'top',offset:[0,-6],opacity:0.97,className:'leaflet-tooltip-cored'});
+    m.bindPopup(popupHTML(d, idx),{maxWidth:260});
     m.addTo(map);
     marcadores.push(m);
   });
   const counter=document.getElementById('map-counter');
-  if(counter) counter.textContent=`${visible.length} coordinadoras`;
+  if(counter) counter.textContent=`${marcadores.length} coordinadoras`;
 }
 
 function filtrarMapa(filtro,btn){
@@ -760,30 +571,146 @@ function filtrarMapa(filtro,btn){
   document.getElementById('map-search').value='';
   renderMarcadores(filtro,'');
 }
+function buscarEnMapa(q){ renderMarcadores(filtroActivo,q); }
 
-function buscarEnMapa(q){
-  renderMarcadores(filtroActivo,q);
+/* ════════════════════ BUSCADOR INDIVIDUAL + REPORTE ════════════════════ */
+let municipioActual = null;
+
+function buscarSugerencias(q){
+  const box = document.getElementById('rm-suggestions');
+  const query = q.toLowerCase().trim();
+  if(!query){ box.style.display='none'; box.innerHTML=''; return; }
+  const matches = DATA.filter(d => d.municipio.toLowerCase().includes(query) || d.departamento.toLowerCase().includes(query)).slice(0,8);
+  if(!matches.length){ box.style.display='none'; box.innerHTML=''; return; }
+  box.innerHTML = matches.map((d) => {
+    const realIdx = DATA.indexOf(d);
+    return `<div class="suggestion-item" onclick="seleccionarYGenerar(${realIdx})">
+      <div class="s-muni">${d.municipio}</div>
+      <div class="s-dept">${d.departamento} · ${d.coordinadora}</div>
+    </div>`;
+  }).join('');
+  box.style.display='block';
 }
 
-// Estilo del tooltip de Leaflet
-const tooltipStyle=document.createElement('style');
-tooltipStyle.textContent=`.leaflet-tooltip-cored{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:0.5rem 0.75rem;font-family:'Sora',sans-serif;font-size:0.8rem;color:#0f172a;box-shadow:0 4px 16px rgba(15,45,94,0.15);white-space:nowrap;}.leaflet-tooltip-cored::before{display:none;}`;
-document.head.appendChild(tooltipStyle);
-
-// ── INICIALIZAR MAPA ──
-// 1) Al cargar la página
-window.addEventListener('load', initMap);
-// 2) Con IntersectionObserver: arranca cuando el div #mapa entra a la pantalla
-if('IntersectionObserver' in window){
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{ if(e.isIntersecting){ initMap(); obs.disconnect(); }});
-  },{threshold:0.1});
-  obs.observe(document.getElementById('mapa'));
+function seleccionarYGenerar(idx){
+  const d = DATA[idx];
+  if(!d) return;
+  municipioActual = d;
+  if(map) map.closePopup();
+  document.getElementById('rm-search').value = `${d.municipio}, ${d.departamento}`;
+  document.getElementById('rm-suggestions').style.display='none';
+  mostrarResultado(d);
+  document.getElementById('resultado-municipio').scrollIntoView({behavior:'smooth', block:'start'});
 }
-// 3) Respaldo por si acaso
-setTimeout(initMap, 1500);
 
-// ── RANKING FORTALECIMIENTO ──
+function mostrarResultado(d){
+  const {fortalecidos, sugeridos} = obtenerTemasMunicipio(d);
+  document.getElementById('rm-title').textContent = `${d.municipio}, ${d.departamento}`;
+  document.getElementById('rm-sub').textContent = d.coordinadora;
+  document.getElementById('rm-nivel').textContent = d.nivel;
+  document.getElementById('rm-nivel').style.color = COL[d.nivel] || 'var(--navy)';
+  document.getElementById('rm-fcount').textContent = fortalecidos.length;
+  document.getElementById('rm-scount').textContent = sugeridos.length;
+  document.getElementById('rm-puntaje').textContent = d.puntaje;
+  document.getElementById('rm-fortalecidos').innerHTML = fortalecidos.length
+    ? fortalecidos.map(t=>`<div class="rm-tema">✓ ${t}</div>`).join('')
+    : `<div class="rm-empty">Aún no hay temas fortalecidos registrados.</div>`;
+  document.getElementById('rm-sugeridos').innerHTML = sugeridos.length
+    ? sugeridos.map(t=>`<div class="rm-tema">→ ${t}</div>`).join('')
+    : `<div class="rm-empty">¡Todos los temas están fortalecidos!</div>`;
+  document.getElementById('resultado-municipio').style.display='block';
+}
+
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.report-suggestions')) {
+    const box = document.getElementById('rm-suggestions');
+    if(box) box.style.display='none';
+  }
+});
+
+/* ════════════════════ GENERAR PDF ════════════════════ */
+function generarPDF(){
+  if(!municipioActual){ alert('Primero busca y selecciona un municipio.'); return; }
+  const d = municipioActual;
+  const {fortalecidos, sugeridos} = obtenerTemasMunicipio(d);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'letter'});
+  const pageW = doc.internal.pageSize.getWidth();
+  const marginX = 56;
+  let y = 64;
+
+  doc.setFillColor(15,45,94);
+  doc.rect(0,0,pageW,90,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('Sistema de Coordinadoras', marginX, 40);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+  doc.text('Reporte de Fortalecimiento Municipal', marginX, 58);
+  doc.setFontSize(8.5);
+  doc.text('Generado: ' + new Date().toLocaleDateString('es-GT',{day:'2-digit',month:'long',year:'numeric'}), marginX, 74);
+
+  y = 122;
+  doc.setTextColor(15,45,94);
+  doc.setFont('helvetica','bold'); doc.setFontSize(18);
+  doc.text(`${d.municipio}, ${d.departamento}`, marginX, y);
+  y += 20;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+  doc.setTextColor(71,85,105);
+  doc.text(d.coordinadora, marginX, y);
+  y += 30;
+
+  const stats = [['Nivel actual', d.nivel],['Temas fortalecidos', String(fortalecidos.length)],['Temas sugeridos', String(sugeridos.length)],['Puntaje', String(d.puntaje)]];
+  const boxW = (pageW - marginX*2 - 30) / 4;
+  stats.forEach((s,i)=>{
+    const x = marginX + i*(boxW+10);
+    doc.setDrawColor(203,213,225); doc.setFillColor(248,250,252);
+    doc.roundedRect(x, y, boxW, 50, 4, 4, 'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(15,45,94);
+    doc.text(s[1], x + boxW/2, y + 24, {align:'center'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(100,116,139);
+    doc.text(s[0].toUpperCase(), x + boxW/2, y + 38, {align:'center'});
+  });
+  y += 75;
+
+  function seccionTemas(titulo, lista, colorRGB, simbolo){
+    doc.setFont('helvetica','bold'); doc.setFontSize(12);
+    doc.setTextColor(colorRGB[0],colorRGB[1],colorRGB[2]);
+    doc.text(titulo, marginX, y);
+    y += 16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    doc.setTextColor(30,41,59);
+    if(!lista.length){
+      doc.setTextColor(100,116,139);
+      doc.text('— Sin elementos —', marginX + 14, y);
+      y += 18;
+    } else {
+      lista.forEach(tema=>{
+        if(y > 730){ doc.addPage(); y = 56; }
+        const lines = doc.splitTextToSize(`${simbolo}  ${tema}`, pageW - marginX*2 - 14);
+        doc.text(lines, marginX + 14, y);
+        y += lines.length * 13 + 5;
+      });
+    }
+    y += 14;
+  }
+
+  seccionTemas('TEMAS FORTALECIDOS', fortalecidos, [21,128,61], '✓');
+  seccionTemas('SUGERENCIAS DE FORTALECIMIENTO', sugeridos, [180,83,9], '→');
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let p=1;p<=pageCount;p++){
+    doc.setPage(p);
+    doc.setDrawColor(203,213,225);
+    doc.line(marginX, 770, pageW-marginX, 770);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(148,163,184);
+    doc.text('Sistema de Coordinadoras para la Reducción de Desastres · Guatemala', marginX, 784);
+    doc.text(`Página ${p} de ${pageCount}`, pageW-marginX, 784, {align:'right'});
+  }
+
+  doc.save(`reporte-${d.municipio.toLowerCase().replace(/\s+/g,'-')}.pdf`);
+}
+
+/* ════════════════════ FORTALECIMIENTO RANKING ════════════════════ */
 const topData=([...DATA].sort((a,b)=>b.temas_fortalecimiento-a.temas_fortalecimiento)).slice(0,10);
 const maxT=topData[0]?.temas_fortalecimiento||1;
 document.getElementById('ftl-ranking').innerHTML=topData.length
@@ -793,20 +720,14 @@ document.getElementById('ftl-ranking').innerHTML=topData.length
     const med=i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1).padStart(2,'0');
     return `<div class="ftl-rank-card">
       <div class="ftl-rank-pos">${med}</div>
-      <div class="ftl-rank-info">
-        <div class="ftl-rank-name">${d.coordinadora}</div>
-        <div class="ftl-rank-dept">${d.municipio} · ${d.departamento}</div>
-      </div>
+      <div class="ftl-rank-info"><div class="ftl-rank-name">${d.coordinadora}</div><div class="ftl-rank-dept">${d.municipio} · ${d.departamento}</div></div>
       <div style="margin-right:0.75rem"><span class="badge badge-${d.nivel.toLowerCase()}">${d.nivel}</span></div>
-      <div class="ftl-bar-wrap">
-        <div class="ftl-bar"><div class="ftl-bar-fill" style="width:${pct}%"></div></div>
-        <div class="ftl-bar-pts">${d.temas_fortalecimiento} temas</div>
-      </div>
+      <div class="ftl-bar-wrap"><div class="ftl-bar"><div class="ftl-bar-fill" style="width:${pct}%"></div></div><div class="ftl-bar-pts">${d.temas_fortalecimiento} temas</div></div>
     </div>`;
   }).join('')
   :`<p style="color:var(--muted);text-align:center;padding:2rem">Sin datos. Edita <code>datos.js</code>.</p>`;
 
-// ── MULTIMEDIA TABS ──
+/* ════════════════════ MULTIMEDIA TABS ════════════════════ */
 function mediaTab(panel, btn){
   document.querySelectorAll('.media-tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.media-panel').forEach(p=>p.classList.remove('active'));
@@ -814,9 +735,10 @@ function mediaTab(panel, btn){
   document.getElementById('panel-'+panel).classList.add('active');
 }
 
-// ── BUENAS PRÁCTICAS PUBLICADAS ──
-// Lee del localStorage las que el admin aprobó en la consola
+/* ════════════════════ BUENAS PRÁCTICAS ════════════════════ */
 const BP_KEY = 'cored_bp_inbox_v1';
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
 function renderPublicadas(){
   const container = document.getElementById('bp-publicadas');
   if(!container) return;
@@ -833,7 +755,7 @@ function renderPublicadas(){
   const colores={Prevención:'#1d4ed8',Preparación:'#7c3aed',Respuesta:'#dc2626',Recuperación:'#16a34a',Comunicación:'#d97706',Capacitación:'#0891b2'};
   container.innerHTML = aprobadas.slice().reverse().map(bp=>{
     const ini=(bp.nombre||'?').trim().split(' ').map(p=>p[0]||'').join('').slice(0,2).toUpperCase();
-    const color=colores[bp.categoria]||'var(--navy)';
+    const color=colores[bp.categoria]||'#0f2d5e';
     const fecha=bp.fecha?new Date(bp.fecha).toLocaleDateString('es-GT',{day:'2-digit',month:'short',year:'numeric'}):'';
     return `<div class="bp-pub-card">
       <div class="bp-pub-avatar" style="background:${color}">${ini}</div>
@@ -850,30 +772,24 @@ function renderPublicadas(){
     </div>`;
   }).join('');
 }
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 renderPublicadas();
 
 async function enviarPractica(){
   const campos={
-    nombre:      document.getElementById('bp-nombre').value.trim(),
+    nombre: document.getElementById('bp-nombre').value.trim(),
     institucion: document.getElementById('bp-institucion').value.trim(),
-    correo:      document.getElementById('bp-correo').value.trim(),
-    categoria:   document.getElementById('bp-categoria').value,
-    titulo:      document.getElementById('bp-titulo').value.trim(),
+    correo: document.getElementById('bp-correo').value.trim(),
+    categoria: document.getElementById('bp-categoria').value,
+    titulo: document.getElementById('bp-titulo').value.trim(),
     descripcion: document.getElementById('bp-descripcion').value.trim()
   };
-  if(Object.values(campos).some(v=>!v)){
-    alert('Por favor completa todos los campos antes de enviar.');return;
-  }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campos.correo)){
-    alert('Ingresa un correo electrónico válido.');return;
-  }
+  if(Object.values(campos).some(v=>!v)){ alert('Por favor completa todos los campos antes de enviar.'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campos.correo)){ alert('Ingresa un correo electrónico válido.'); return; }
   const btn=document.getElementById('bp-submit');
-  btn.disabled=true;btn.textContent='Enviando…';
+  btn.disabled=true; btn.textContent='Enviando…';
   try{
     const res=await fetch('https://formspree.io/f/xaqznwaz',{
-      method:'POST',
-      headers:{'Accept':'application/json','Content-Type':'application/json'},
+      method:'POST', headers:{'Accept':'application/json','Content-Type':'application/json'},
       body:JSON.stringify({...campos,email:campos.correo})
     });
     if(res.ok){
@@ -882,13 +798,12 @@ async function enviarPractica(){
       document.getElementById('bp-success').style.display='block';
       btn.textContent='¡Enviado!';
     }else{
-      const data=await res.json();
-      alert('Error al enviar: '+(data?.error||'intenta de nuevo.'));
-      btn.disabled=false;btn.textContent='Enviar para revisión ▸';
+      alert('Error al enviar. Intenta de nuevo.');
+      btn.disabled=false; btn.textContent='Enviar para revisión ▸';
     }
   }catch(e){
     alert('Error de conexión. Verifica tu internet e intenta de nuevo.');
-    btn.disabled=false;btn.textContent='Enviar para revisión ▸';
+    btn.disabled=false; btn.textContent='Enviar para revisión ▸';
   }
 }
 </script>
