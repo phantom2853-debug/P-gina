@@ -103,16 +103,17 @@ main{flex:1;}
 .legend-item{display:flex;align-items:center;gap:0.45rem;font-size:0.8rem;color:var(--muted);font-weight:600;}
 .legend-dot{width:13px;height:13px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.15);}
 .map-counter{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted2);margin-left:auto;}
-.leaflet-popup-content-wrapper{background:#fff;border-radius:10px;border:1px solid var(--border);box-shadow:0 8px 24px rgba(15,45,94,0.15);padding:0;}
+.leaflet-popup-content-wrapper{background:#0f2d5e;border-radius:10px;border:1px solid #2d4a7a;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:0;}
+.leaflet-popup-tip{background:#0f2d5e;}
 .leaflet-popup-content{margin:0;padding:0;}
 .popup-inner{padding:1rem 1.1rem;min-width:200px;}
-.popup-name{font-weight:700;color:var(--navy);font-size:0.92rem;margin-bottom:0.2rem;}
-.popup-loc{font-size:0.75rem;color:var(--muted2);margin-bottom:0.6rem;}
-.popup-row{display:flex;justify-content:space-between;font-size:0.78rem;padding:0.2rem 0;border-top:1px solid var(--border);}
-.popup-key{color:var(--muted);}
-.popup-val{font-weight:700;color:var(--navy);}
-.popup-pdf-btn{display:block;width:100%;margin-top:0.6rem;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:0.4rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;}
-.leaflet-tooltip-cored{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:0.5rem 0.75rem;font-family:'Sora',sans-serif;font-size:0.8rem;color:#0f172a;box-shadow:0 4px 16px rgba(15,45,94,0.15);white-space:nowrap;}
+.popup-name{font-weight:700;color:#facc15;font-size:0.92rem;margin-bottom:0.2rem;}
+.popup-loc{font-size:0.75rem;color:#94a3b8;margin-bottom:0.6rem;}
+.popup-row{display:flex;justify-content:space-between;font-size:0.78rem;padding:0.2rem 0;border-top:1px solid #2d4a7a;color:#e2e8f0;}
+.popup-key{color:#94a3b8;}
+.popup-val{font-weight:700;color:#facc15;}
+.popup-pdf-btn{display:block;width:100%;margin-top:0.6rem;background:#facc15;color:#0f2d5e;border:none;border-radius:6px;padding:0.4rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;}
+.leaflet-tooltip-cored{background:#0f2d5e;border:1px solid #2d4a7a;border-radius:8px;padding:0.5rem 0.75rem;font-family:'Sora',sans-serif;font-size:0.8rem;color:#e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,0.4);white-space:nowrap;}
 .leaflet-tooltip-cored::before{display:none;}
 
 /* Buscador / Reporte municipio */
@@ -520,7 +521,7 @@ function initMap(){
   const el = document.getElementById('mapa');
   if(!el || el.offsetHeight === 0) return;
   map = L.map('mapa', {zoomControl:true, preferCanvas:true}).setView([15.1,-90.3], 7);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     attribution:'© <a href="https://carto.com">CARTO</a> © <a href="https://openstreetmap.org">OSM</a>',
     maxZoom:18, subdomains:'abcd'
   }).addTo(map);
